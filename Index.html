@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Infografía: Organizaciones que apoyan la democracia y los DDHH en El Salvador</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1320;--accent:#7dd3fc;--muted:#94a3b8;--glass:rgba(255,255,255,0.03)}
+    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, 'Helvetica Neue', Arial;color:#e6eef6;background:linear-gradient(180deg,#071029 0%, #071b2a 60%);}
+    .wrap{max-width:1200px;margin:28px auto;padding:22px}
+    header{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+    h1{margin:0;font-size:28px}
+    p.lead{color:var(--muted);margin:6px 0 18px}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;padding:16px;box-shadow:0 6px 20px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03);transition:transform 0.25s ease}
+    .card:hover{transform:translateY(-4px)}
+    .card h3{margin:0 0 8px;font-size:18px}
+    .logo{width:56px;height:56px;border-radius:10px;background:var(--glass);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent);}
+    .meta{color:var(--muted);font-size:13px}
+    .actions{margin-top:12px;display:flex;gap:10px;flex-wrap:wrap}
+    button{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:8px;color:var(--accent);cursor:pointer;transition:background 0.2s}
+    button:hover{background:rgba(125,211,252,0.1)}
+    button.secondary{color:var(--muted);border-style:dashed}
+    .details{margin-top:10px;color:#cfe9ff;font-size:14px;display:none;line-height:1.5}
+    .open .details{display:block}
+    .filters{display:flex;gap:8px;margin:18px 0 10px;flex-wrap:wrap}
+    .search{flex:1}
+    input[type=search]{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+    .footer{color:var(--muted);font-size:13px;margin-top:24px;text-align:center;line-height:1.5}
+    .resources{margin-top:30px;background:rgba(255,255,255,0.02);border-radius:14px;padding:20px;box-shadow:0 6px 18px rgba(2,6,23,0.4)}
+    .resources h2{margin-top:0;color:var(--accent)}
+    .resources ul{padding-left:18px;line-height:1.6}
+    @media(max-width:920px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:600px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Organizaciones que apoyan la democracia y los Derechos Humanos en El Salvador</h1>
+        <p class="lead">Explora estas instituciones y ONG que defienden la democracia, la justicia y los derechos fundamentales. Usa las tarjetas interactivas para ver detalles, copiar resúmenes o exportar.</p>
+      </div>
+    </header>
+
+    <div class="filters">
+      <input class="search" id="search" type="search" placeholder="🔍 Buscar por nombre u actividad (ej: "ONU", "CIDH", "ONG")">
+      <button id="reset" class="secondary">Restablecer</button>
+    </div>
+
+    <div class="grid" id="cards"></div>
+
+    <section class="resources">
+      <h2>¿Cómo puedes involucrarte?</h2>
+      <ul>
+        <li><strong>Informarte:</strong> Sigue comunicados oficiales de ONU, OEA, y ONG locales.</li>
+        <li><strong>Participar:</strong> Únete a actividades educativas o foros ciudadanos que promueven la democracia.</li>
+        <li><strong>Denunciar:</strong> Si presencias una violación de DDHH, contacta con ONG confiables como Cristosal o Pro-Búsqueda.</li>
+        <li><strong>Apoyar:</strong> Difunde informes, dona a organizaciones locales o participa como voluntario.</li>
+      </ul>
+    </section>
+
+    <div class="footer">Haz clic en "Ver más" para desplegar detalles, en "Copiar resumen" para pegar la información en tu trabajo, o imprime/exporta esta infografía como PDF para presentarla en clase.</div>
+  </div>
+
+<script>
+const orgs = [
+  {id:'ohchr',name:'Oficina del Alto Comisionado de la ONU para los Derechos Humanos (OHCHR)',short:'Monitorea la situación de DDHH y brinda apoyo técnico en El Salvador.',details:'La OHCHR apoya a defensores, evalúa políticas públicas y mantiene una oficina regional que cubre El Salvador.',contact:'Sitio web de Naciones Unidas y oficina regional.'},
+  {id:'iachr',name:'Comisión Interamericana de Derechos Humanos (CIDH / IACHR)',short:'Analiza el impacto del régimen de excepción y otros temas de DDHH.',details:'La CIDH emite informes y recomendaciones sobre derechos civiles, solicita medidas cautelares y observa la situación democrática.',contact:'Comunicados y documentos en la página de la OEA.'},
+  {id:'undp',name:'Programa de las Naciones Unidas para el Desarrollo (UNDP)',short:'Promueve gobernanza, acceso a justicia y seguridad ciudadana.',details:'UNDP implementa proyectos de gobernanza democrática y cooperación 2022–2026 que fortalecen instituciones públicas.',contact:'Plan de cooperación país en la web del PNUD.'},
+  {id:'cristosal',name:'Cristosal (ONG salvadoreña)',short:'Defensa de DDHH, lucha contra la corrupción y acompañamiento legal.',details:'Cristosal acompaña a víctimas, hace investigación y promueve transparencia. En 2025 suspendió operaciones en el país por seguridad.',contact:'Página oficial y comunicados.'},
+  {id:'prob',name:'Pro-Búsqueda (ONG salvadoreña)',short:'Busca niños desaparecidos durante la guerra civil y promueve justicia.',details:'Pro-Búsqueda documenta casos, promueve reunificación familiar y litigios para verdad y reparación.',contact:'Casos e informes en su web.'},
+  {id:'amnesty',name:'Amnistía Internacional',short:'ONG global que investiga abusos y presiona a gobiernos.',details:'Amnistía publica informes críticos sobre el estado de derechos humanos en El Salvador, con foco en libertad de prensa y garantías judiciales.',contact:'Sección El Salvador en amnesty.org.'},
+  {id:'hrw',name:'Human Rights Watch',short:'ONG internacional que documenta violaciones y presiona reformas.',details:'HRW ha emitido alertas sobre abusos durante el régimen de excepción y el impacto en derechos básicos.',contact:'Informes disponibles en hrw.org.'},
+  {id:'ue',name:'Delegación de la Unión Europea en El Salvador',short:'Promueve democracia, Estado de derecho y cooperación internacional.',details:'La UE financia programas de transparencia, acompañamiento electoral y fortalecimiento institucional.',contact:'Delegación oficial en San Salvador.'},
+  {id:'icrc',name:'Comité Internacional de la Cruz Roja (CICR)',short:'Atiende a víctimas de violencia y promueve derecho humanitario.',details:'El CICR trabaja en protección a detenidos y apoyo a comunidades afectadas por violencia y migración.',contact:'Oficina regional y sitio web oficial.'}
+];
+
+function createCard(o){
+  const div = document.createElement('div');
+  div.className='card';
+  div.innerHTML = `
+    <div style="display:flex;gap:12px;align-items:center">
+      <div class="logo">${o.name.split(' ').slice(0,2).map(s=>s[0]).join('')}</div>
+      <div style="flex:1">
+        <h3>${o.name}</h3>
+        <div class="meta">${o.short}</div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="toggle">Ver más</button>
+      <button class="copy">Copiar resumen</button>
+      <button class="secondary" data-id="${o.id}">Exportar</button>
+    </div>
+    <div class="details">${o.details}<br><strong>Contacto / recursos:</strong> ${o.contact}</div>
+  `;
+  div.querySelector('.toggle').addEventListener('click', ()=>{div.classList.toggle('open')});
+  div.querySelector('.copy').addEventListener('click', ()=>{
+    navigator.clipboard.writeText(o.name + " - " + o.short + "\n" + o.details).then(()=>alert('✅ Resumen copiado al portapapeles'));
+  });
+  return div;
+}
+
+const container = document.getElementById('cards');
+orgs.forEach(o=>container.appendChild(createCard(o)));
+
+// Search
+const search = document.getElementById('search');
+search.addEventListener('input', ()=>{
+  const q = search.value.toLowerCase().trim();
+  container.innerHTML='';
+  orgs.filter(o=> (o.name+o.short+o.details).toLowerCase().includes(q)).forEach(o=>container.appendChild(createCard(o)));
+});
+
+// Reset
+document.getElementById('reset').addEventListener('click', ()=>{search.value=''; search.dispatchEvent(new Event('input'))});
+
+// Export simple (print)
+container.addEventListener('click', (e)=>{
+  if(e.target.matches('button.secondary')){
+    window.print();
+  }
+});
+</script>
+</body>
+</html>
