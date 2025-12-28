@@ -937,6 +937,12 @@ function renderWiki() {
     if (isGame) {
         loadRAWGSimilarGames(item);
         loadRAWGTrailers(item);
+
+        // Automatic enrichment if not already done
+        if (!currentState.enrichedData[item.id]) {
+            console.log(`✨ Automáticamente enriqueciendo datos para: ${item.title}`);
+            enrichSingleGame(item.id);
+        }
     }
 }
 
