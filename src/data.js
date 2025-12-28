@@ -113,22 +113,24 @@ const GAMES_DATA = [
         rawgId: 3439,
         developer: "DONTNOD Entertainment",
         publisher: "Square Enix",
-        genre: "Graphic adventure",
+        genre: "Graphic adventure, Drama, Supernatural",
         releaseDate: "2015-01-30",
         description: {
-            en: "Follow the story of Max Caulfield, a photography senior who discovers she can rewind time while saving her best friend Chloe Price. The pair soon find themselves investigating the mysterious disappearance of fellow student Rachel Amber, uncovering a dark side to life in Arcadia Bay.",
-            es: "Sigue la historia de Max Caulfield, una estudiante de fotografía que descubre que puede retroceder en el tiempo mientras salva a su mejor amiga Chloe Price. Ambas pronto se encuentran investigando la misteriosa desaparición de su compañera Rachel Amber, descubriendo el lado oscuro de la vida en Arcadia Bay."
+            en: "An episodic adventure game that follows Max Caulfield, a photography student who discovers she can rewind time. Every choice leads to the 'Butterfly Effect', altering the past, present, and future in the town of Arcadia Bay.",
+            es: "Un juego de aventura episódico que sigue a Max Caulfield, una estudiante de fotografía que descubre que puede retroceder en el tiempo. Cada elección conduce al 'Efecto Mariposa', alterando el pasado, presente y futuro en el pueblo de Arcadia Bay."
         },
         detailedHistory: {
-            en: "Released episodically throughout 2015, Life is Strange became a sleeper hit known for its relatable characters, nostalgic atmosphere, and emotional choices. It won numerous awards, including the BAFTA Games Award for Best Story.",
-            es: "Lanzado de forma episódica a lo largo de 2015, Life is Strange se convirtió en un éxito inesperado conocido por sus personajes cercanos, atmósfera nostálgica y decisiones emocionales. Ganó numerosos premios, incluido el BAFTA Games Award a la Mejor Historia."
+            en: "Life is Strange was a breakthrough for DONTNOD, proving that narrative-driven games could tackle mature themes like bullying, suicide, and loss with grace. It features a unique indie-folk soundtrack and a hand-painted aesthetic that remains iconic.",
+            es: "Life is Strange fue un gran éxito para DONTNOD, demostrando que los juegos centrados en la narrativa podían tratar temas maduros como el acoso, el suicidio y la pérdida. Cuenta con una banda sonora indie-folk única y una estética pintada a mano."
         },
         development: {
-            en: "Developed by French studio Dontnod Entertainment, the game's mechanics were built around the 'Butterfly Effect'—the idea that even the smallest choices could have massive consequences. The distinctive hand-painted art style was chosen to give the game a timeless, nostalgic feel.",
-            es: "Desarrollado por el estudio francés Dontnod Entertainment, las mecánicas del juego se construyeron en torno al 'Efecto Mariposa': la idea de que incluso las decisiones más pequeñas pueden tener consecuencias masivas. El estilo artístico pintado a mano fue elegido para darle una sensación atemporal."
+            en: "Built using Unreal Engine 3, the development focused on creating a deep emotional connection between the player and the protagonists. The 'Rewind' mechanic was designed to remove the frustration of choice-based games, allowing players to explore consequences before committing.",
+            es: "Construido con Unreal Engine 3, el desarrollo se centró en crear una conexión emocional profunda entre el jugador y los protagonistas. La mecánica de 'Retroceso' fue diseñada para eliminar la frustración de los juegos de decisiones."
         },
         companyId: "dontnod",
-        image: "https://cdn.cloudflare.steamstatic.com/steam/apps/319630/header.jpg"
+        image: "https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/319630/library_600x900_2x.jpg",
+        platforms: ["PC", "PlayStation 4", "Xbox One", "Nintendo Switch", "PlayStation 3", "Xbox 360", "iOS", "Android"],
+        engine: "Unreal Engine 3"
     },
     {
         id: "minecraft",
@@ -2538,14 +2540,14 @@ const COMPANIES_DATA = [
         }
     },
     {
-        id: "telltale",
-        name: "Telltale Games",
-        image: "https://www.google.com/s2/favicons?domain=telltale.com&sz=128",
-        founded: "Julio de 2004",
-        headquarters: "San Rafael, California, USA",
+        id: "dontnod",
+        name: "DONTNOD Entertainment",
+        image: "https://www.google.com/s2/favicons?domain=dontnodgame.com&sz=128",
+        founded: "Junio de 2008",
+        headquarters: "París, Francia",
         description: {
-            en: "Telltale Games was an American video game developer based in San Rafael, California. Best known for their episodic narrative adventure games like The Walking Dead.",
-            es: "Telltale Games fue un desarrollador de videojuegos estadounidense con sede en San Rafael, California. Conocido por sus juegos de aventuras narrativas episódicas como The Walking Dead."
+            en: "Don't Nod Entertainment SA (trade name: Don't Nod, formerly Dontnod Entertainment) is a French video game developer based in Paris, creators of Life is Strange.",
+            es: "Don't Nod Entertainment SA (nombre comercial: Don't Nod, anteriormente Dontnod Entertainment) es un desarrollador de videojuegos francés con sede en París, creadores de Life is Strange."
         }
     },
     {
@@ -2766,17 +2768,6 @@ const COMPANIES_DATA = [
         description: {
             en: "Quantic Dream SA is a French video game developer and publisher based in Paris, known for Heavy Rain and Detroit: Become Human.",
             es: "Quantic Dream SA es un desarrollador y editor de videojuegos francés con sede en París, conocido por Heavy Rain y Detroit: Become Human."
-        }
-    },
-    {
-        id: "dontnod",
-        name: "DONTNOD Entertainment",
-        image: "https://www.google.com/s2/favicons?domain=dontnodgame.com&sz=128",
-        founded: "Junio de 2008",
-        headquarters: "París, Francia",
-        description: {
-            en: "Don't Nod Entertainment SA (trade name: Don't Nod, formerly Dontnod Entertainment) is a French video game developer based in Paris.",
-            es: "Don't Nod Entertainment SA (nombre comercial: Don't Nod, anteriormente Dontnod Entertainment) es un desarrollador de videojuegos francés con sede en París."
         }
     }
 ];
