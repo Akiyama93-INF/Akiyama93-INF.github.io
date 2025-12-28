@@ -11,7 +11,7 @@
 // ============================================================================
 
 const RAWG_CONFIG = {
-    baseUrl: '/api/rawg', // Points to our Vercel serverless function
+    baseUrl: '/.netlify/functions/rawg', // Points to our Netlify serverless function
     cache: new Map(),
     cacheExpiry: 1000 * 60 * 60 * 24, // 24 hours
 };
