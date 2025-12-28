@@ -212,31 +212,37 @@ async function getGameDLC(gameId) {
  */
 async function enrichGameData(game) {
     try {
-        // Find game on RAWG
-        const rawgGame = await findGameByName(game.title);
+        let rawgId = game.rawgId;
+        let slug = null;
 
-        if (!rawgGame) {
-            console.log(`⚠️ Could not enrich: ${game.title}`);
-            return game;
+        // If we don't have a specific ID, we search by name
+        if (!rawgId) {
+            const rawgGame = await findGameByName(game.title);
+            if (!rawgGame) {
+                console.log(`⚠️ Could not enrich: ${game.title}`);
+                return game;
+            }
+            rawgId = rawgGame.id;
+            slug = rawgGame.slug;
         }
 
-        // Get full details
-        const details = await getGameDetails(rawgGame.id);
+        // Get full details using the guaranteed ID
+        const details = await getGameDetails(rawgId);
 
         // Get screenshots
-        const screenshots = await getGameScreenshots(rawgGame.id, 6);
+        const screenshots = await getGameScreenshots(rawgId, 6);
 
         // Create enriched game object
         const enriched = {
             ...game,
             rawg: {
-                id: rawgGame.id,
-                slug: rawgGame.slug,
-                rating: rawgGame.rating,
-                ratingsCount: rawgGame.ratings_count,
-                metacritic: rawgGame.metacritic,
-                playtime: rawgGame.playtime,
-                esrbRating: rawgGame.esrb_rating?.name,
+                id: rawgId,
+                slug: slug || details?.slug,
+                rating: details?.rating,
+                ratingsCount: details?.ratings_count,
+                metacritic: details?.metacritic,
+                playtime: details?.playtime,
+                esrbRating: details?.esrb_rating?.name,
                 screenshots: screenshots.map(s => ({
                     id: s.id,
                     image: s.image,
