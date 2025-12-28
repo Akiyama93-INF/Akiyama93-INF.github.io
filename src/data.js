@@ -110,6 +110,7 @@ const GAMES_DATA = [
     {
         id: "the-walking-dead",
         title: "The Walking Dead",
+        rawgId: 3439,
         developer: "Telltale Games",
         publisher: "Telltale Games",
         genre: "Graphic adventure",
