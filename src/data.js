@@ -108,7 +108,7 @@ const GAMES_DATA = [
         companyId: "capcom"
     },
     {
-        id: "the-walking-dead-season-1",
+        id: "the-walking-dead",
         title: "The Walking Dead: Season 1",
         rawgId: 3439,
         developer: "Telltale Games",
