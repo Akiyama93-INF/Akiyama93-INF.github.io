@@ -108,21 +108,27 @@ const GAMES_DATA = [
         companyId: "capcom"
     },
     {
-        id: "life-is-strange-episode-1-2",
+        id: "life-is-strange",
         title: "Life is Strange",
+        rawgId: 3439,
         developer: "DONTNOD Entertainment",
-        publisher: "Square Enix, Feral Interactive",
+        publisher: "Square Enix",
         genre: "Graphic adventure",
-        releaseDate: "2012-04-24",
+        releaseDate: "2015-01-30",
         description: {
-            en: "Focus on story and character development over traditional puzzle-solving. Every choice you make as Lee Everett will shape the journey of young Clementine in a world overrun by the undead.",
-            es: "Céntrate en la historia y el desarrollo de los personajes por encima de la resolución de acertijos tradicionales. Cada elección que tomes como Lee Everett dará forma al viaje de la joven Clementine en un mundo infestado de muertos vivientes."
+            en: "Follow the story of Max Caulfield, a photography senior who discovers she can rewind time while saving her best friend Chloe Price. The pair soon find themselves investigating the mysterious disappearance of fellow student Rachel Amber, uncovering a dark side to life in Arcadia Bay.",
+            es: "Sigue la historia de Max Caulfield, una estudiante de fotografía que descubre que puede retroceder en el tiempo mientras salva a su mejor amiga Chloe Price. Ambas pronto se encuentran investigando la misteriosa desaparición de su compañera Rachel Amber, descubriendo el lado oscuro de la vida en Arcadia Bay."
         },
         detailedHistory: {
-            en: "The Walking Dead revitalized the adventure genre with its focus on emotional consequences and binary choices. It won numerous 'Game of the Year' awards and established the 'Telltale formula' that would influence narrative games for a decade.",
-            es: "The Walking Dead revitalizó el género de las aventuras con su enfoque en las consecuencias emocionales y las decisiones binarias. Ganó numerosos premios al 'Juego del Año' y estableció la 'fórmula Telltale' que influiría en los juegos narrativos durante una década."
+            en: "Released episodically throughout 2015, Life is Strange became a sleeper hit known for its relatable characters, nostalgic atmosphere, and emotional choices. It won numerous awards, including the BAFTA Games Award for Best Story.",
+            es: "Lanzado de forma episódica a lo largo de 2015, Life is Strange se convirtió en un éxito inesperado conocido por sus personajes cercanos, atmósfera nostálgica y decisiones emocionales. Ganó numerosos premios, incluido el BAFTA Games Award a la Mejor Historia."
         },
-        companyId: "telltale"
+        development: {
+            en: "Developed by French studio Dontnod Entertainment, the game's mechanics were built around the 'Butterfly Effect'—the idea that even the smallest choices could have massive consequences. The distinctive hand-painted art style was chosen to give the game a timeless, nostalgic feel.",
+            es: "Desarrollado por el estudio francés Dontnod Entertainment, las mecánicas del juego se construyeron en torno al 'Efecto Mariposa': la idea de que incluso las decisiones más pequeñas pueden tener consecuencias masivas. El estilo artístico pintado a mano fue elegido para darle una sensación atemporal."
+        },
+        companyId: "dontnod",
+        image: "https://cdn.cloudflare.steamstatic.com/steam/apps/319630/header.jpg"
     },
     {
         id: "minecraft",
@@ -2760,6 +2766,17 @@ const COMPANIES_DATA = [
         description: {
             en: "Quantic Dream SA is a French video game developer and publisher based in Paris, known for Heavy Rain and Detroit: Become Human.",
             es: "Quantic Dream SA es un desarrollador y editor de videojuegos francés con sede en París, conocido por Heavy Rain y Detroit: Become Human."
+        }
+    },
+    {
+        id: "dontnod",
+        name: "DONTNOD Entertainment",
+        image: "https://www.google.com/s2/favicons?domain=dontnodgame.com&sz=128",
+        founded: "Junio de 2008",
+        headquarters: "París, Francia",
+        description: {
+            en: "Don't Nod Entertainment SA (trade name: Don't Nod, formerly Dontnod Entertainment) is a French video game developer based in Paris.",
+            es: "Don't Nod Entertainment SA (nombre comercial: Don't Nod, anteriormente Dontnod Entertainment) es un desarrollador de videojuegos francés con sede en París."
         }
     }
 ];
