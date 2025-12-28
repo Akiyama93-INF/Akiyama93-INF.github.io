@@ -28,7 +28,7 @@ Esta aplicación combina una base de datos meticulosa con una interfaz de vangua
 
 ## 🚀 Cómo empezar
 
-1.  Visita la web en: [[Akiyama93-INF.github.io](https://Akiyama93-INF.github.io](https://akiyama93-inf.github.io/GameWiki-The-Encyclopedia-of-games/))
+1.  Visita la web en: https://akiyama93-inf.github.io/GameWiki-The-Encyclopedia-of-games/.
 2.  ¡Empieza a explorar o busca ese juego que marcó tu infancia! 🕹️
 
 ---
