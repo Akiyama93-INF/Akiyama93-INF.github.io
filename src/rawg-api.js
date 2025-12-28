@@ -11,32 +11,10 @@
 // ============================================================================
 
 const RAWG_CONFIG = {
-    baseUrl: 'https://api.rawg.io/api',
-    apiKey: '', // Will be set by user
+    baseUrl: '/.netlify/functions/rawg', // Points to our Netlify serverless function
     cache: new Map(),
     cacheExpiry: 1000 * 60 * 60 * 24, // 24 hours
 };
-
-/**
- * Set the RAWG API key
- * @param {string} apiKey - Your RAWG API key from https://rawg.io/login/?forward=developer
- */
-function setRAWGApiKey(apiKey) {
-    RAWG_CONFIG.apiKey = apiKey;
-    localStorage.setItem('rawg-api-key', apiKey);
-    console.log('✅ RAWG API key configured');
-}
-
-/**
- * Load API key from localStorage
- */
-function loadRAWGApiKey() {
-    const savedKey = localStorage.getItem('rawg-api-key');
-    if (savedKey) {
-        RAWG_CONFIG.apiKey = savedKey;
-        console.log('✅ RAWG API key loaded from storage');
-    }
-}
 
 // ============================================================================
 // CACHE MANAGEMENT
@@ -73,20 +51,15 @@ function setCachedData(key, data) {
 // ============================================================================
 
 /**
- * Make a request to RAWG API
+ * Make a request to RAWG API via the Vercel Proxy
  * @param {string} endpoint - API endpoint (e.g., '/games')
  * @param {object} params - Query parameters
  * @returns {Promise<object>} API response data
  */
 async function rawgRequest(endpoint, params = {}) {
-    if (!RAWG_CONFIG.apiKey) {
-        console.warn('⚠️ RAWG API key not set. Call setRAWGApiKey() first.');
-        return null;
-    }
-
-    // Build URL with params
-    const url = new URL(`${RAWG_CONFIG.baseUrl}${endpoint}`);
-    url.searchParams.append('key', RAWG_CONFIG.apiKey);
+    // Build URL for our local proxy
+    const url = new URL(window.location.origin + RAWG_CONFIG.baseUrl);
+    url.searchParams.append('endpoint', endpoint);
 
     Object.keys(params).forEach(key => {
         if (params[key] !== null && params[key] !== undefined) {
@@ -103,11 +76,11 @@ async function rawgRequest(endpoint, params = {}) {
     }
 
     try {
-        console.log('🌐 Fetching from RAWG:', endpoint);
+        console.log('🌐 Fetching via Proxy:', endpoint);
         const response = await fetch(url);
 
         if (!response.ok) {
-            throw new Error(`RAWG API error: ${response.status} ${response.statusText}`);
+            throw new Error(`Proxy error: ${response.status} ${response.statusText}`);
         }
 
         const data = await response.json();
@@ -115,7 +88,7 @@ async function rawgRequest(endpoint, params = {}) {
         return data;
 
     } catch (error) {
-        console.error('❌ RAWG API request failed:', error);
+        console.error('❌ Request failed:', error);
         return null;
     }
 }
@@ -367,5 +340,4 @@ function getRAWGCacheStats() {
 // EXPORTS
 // ============================================================================
 
-// Auto-load API key on module load
-loadRAWGApiKey();
+// No auto-load needed for proxy
