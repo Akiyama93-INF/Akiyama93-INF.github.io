@@ -382,9 +382,15 @@ function updateUILabels() {
     el.langText.innerText = currentState.lang === 'es' ? 'EN' : 'ES'; // Muestra a qué cambiará
 }
 
-function renderHome(filterGenre = undefined) {
+function renderHome(filterGenre = undefined, isFromPopState = false) {
     currentState.view = 'home';
     document.title = "GameWiki - Home";
+
+    // Handle History
+    if (!isFromPopState) {
+        const state = { view: 'home', genre: filterGenre || currentState.currentGenre };
+        history.pushState(state, "", "");
+    }
 
     setTimeout(() => {
         if (typeof currentState.homeScrollY === 'number') {
@@ -412,7 +418,7 @@ function renderHome(filterGenre = undefined) {
     el.appContent.style.transform = 'translateY(0)';
 
     document.title = activeGenre ? `Juegos de ${activeGenre} - GameWiki` : 'GameWiki - Tu Enciclopedia de Videojuegos';
-    window.scrollTo(0, 0);
+    if (!isFromPopState) window.scrollTo(0, 0);
 
     // 1. Render Genre Filter Bar (Collapsible)
     const allGenres = new Set();
@@ -517,16 +523,21 @@ function renderHome(filterGenre = undefined) {
     });
 }
 
-function renderFavorites(activeCollection = 'favorites') {
+function renderFavorites(activeCollection = 'favorites', isFromPopState = false) {
     currentState.view = 'favorites';
     document.title = `${UI_TEXT[currentState.lang].myFavorites} - GameWiki`;
+
+    if (!isFromPopState) {
+        const state = { view: 'favorites', collection: activeCollection };
+        history.pushState(state, "", "");
+    }
 
     el.hero.classList.add('hidden');
     el.gameGrid.classList.remove('hidden');
     el.genreFilter.classList.add('hidden');
     el.wikiContainer.classList.add('hidden');
 
-    window.scrollTo(0, 0);
+    if (!isFromPopState) window.scrollTo(0, 0);
 
     const t = UI_TEXT[currentState.lang];
     const collections = {
@@ -603,7 +614,7 @@ function renderFavorites(activeCollection = 'favorites') {
 }
 
 
-function navigateToWiki(id) {
+function navigateToWiki(id, isFromPopState = false) {
     // Save scroll position before leaving home
     if (currentState.view === 'home') {
         currentState.homeScrollY = window.scrollY;
@@ -611,7 +622,13 @@ function navigateToWiki(id) {
 
     currentState.view = 'wiki';
     currentState.currentId = id;
-    window.scrollTo(0, 0);
+
+    if (!isFromPopState) {
+        const state = { view: 'wiki', id: id };
+        history.pushState(state, "", "");
+        window.scrollTo(0, 0);
+    }
+
     const item = GAMES_DATA.find(g => g.id === id) || COMPANIES_DATA.find(c => c.id === id);
     if (item) document.title = `${item.title || item.name} - GameWiki`;
     renderWiki();
@@ -1929,7 +1946,26 @@ function init() {
         }
     }
 
-    renderHome();
+    // URL History Handling
+    window.onpopstate = function (event) {
+        if (event.state) {
+            const state = event.state;
+            if (state.view === 'home') {
+                renderHome(state.genre, true);
+            } else if (state.view === 'favorites') {
+                renderFavorites(state.collection, true);
+            } else if (state.view === 'wiki') {
+                navigateToWiki(state.id, true);
+            }
+        } else {
+            // Default to home if no state
+            renderHome(null, true);
+        }
+    };
+
+    renderHome(null, true);
+    // Push initial home state
+    history.replaceState({ view: 'home', genre: null }, "", "");
 }
 
 // ============================================================================
