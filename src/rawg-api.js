@@ -252,8 +252,8 @@ async function enrichGameData(game) {
                     name: p.platform.name,
                     requirements: p.requirements || null
                 })) || [],
-                stores: rawgGame.stores?.map(s => s.store.name) || [],
-                tags: rawgGame.tags?.slice(0, 10).map(t => t.name) || [],
+                stores: details.stores?.map(s => s.store.name) || [],
+                tags: details.tags?.slice(0, 5).map(t => t.name) || [],
                 website: details?.website,
                 reddit: details?.reddit_url,
                 description: details?.description_raw,
