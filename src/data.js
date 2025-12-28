@@ -108,11 +108,10 @@ const GAMES_DATA = [
         companyId: "capcom"
     },
     {
-        id: "the-walking-dead",
-        title: "The Walking Dead: Season 1",
-        rawgId: 3439,
-        developer: "Telltale Games",
-        publisher: "Telltale Games",
+        id: "life-is-strange-episode-1-2",
+        title: "Life is Strange",
+        developer: "DONTNOD Entertainment",
+        publisher: "Square Enix, Feral Interactive",
         genre: "Graphic adventure",
         releaseDate: "2012-04-24",
         description: {
