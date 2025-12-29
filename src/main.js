@@ -62,6 +62,70 @@ const STEAM_APP_IDS = {
     "mass-effect-3": 1238020
 };
 
+const MANUAL_DESCRIPTIONS = {
+    // Top Games
+    "3498": { // GTA V
+        en: "Experience Rockstar Games' critically acclaimed open-world phenomenon. Explore the sprawling metropolis of Los Santos and the wilderness of Blaine County in the ultimate Grand Theft Auto experience.",
+        es: "Experimenta el fenómeno de mundo abierto de Rockstar Games. Explora la metrópolis de Los Santos y el desierto del condado de Blaine en la experiencia definitiva de Grand Theft Auto."
+    },
+    "3328": { // The Witcher 3
+        en: "The Witcher: Wild Hunt is a story-driven open world RPG set in a visually stunning fantasy universe full of meaningful choices and impactful consequences.",
+        es: "The Witcher: Wild Hunt es un RPG de mundo abierto centrado en la historia, ambientado en un universo de fantasía visualmente impresionante lleno de decisiones significativas."
+    },
+    "4200": { // Portal 2
+        en: "The sequel to the ground-breaking hit that blended gaming, science, and surprise. Portal 2 draws from the award-winning formula of innovative gameplay, story, and music.",
+        es: "La secuela del éxito revolucionario que mezcló juegos, ciencia y sorpresa. Portal 2 se basa en la fórmula premiada de jugabilidad innovadora, historia y música."
+    },
+    "5286": { // Tomb Raider
+        en: "Tomb Raider explores the intense and gritty origin story of Lara Croft and her ascent from a young woman to a hardened survivor.",
+        es: "Tomb Raider explora la intensa y cruda historia del origen de Lara Croft y su ascenso de una mujer joven a una superviviente endurecida."
+    },
+    "5679": { // Skyrim
+        en: "The next chapter in the highly anticipated Elder Scrolls saga. Skyrim reimagines and revolutionizes the open-world fantasy epic, bringing to life a complete virtual world.",
+        es: "El siguiente capítulo de la muy esperada saga Elder Scrolls. Skyrim reinventa y revoluciona la epopeya fantástica de mundo abierto, dando vida a un mundo virtual completo."
+    },
+    "422": { // Cyberpunk 2077
+        en: "Cyberpunk 2077 is an open-world, action-adventure RPG set in the megalopolis of Night City, where you play as a cyberpunk mercenary wrapped up in a do-or-die fight for survival.",
+        es: "Cyberpunk 2077 es un RPG de acción y aventura de mundo abierto ambientado en la megalópolis de Night City, donde juegas como un mercenario cyberpunk en una lucha por la supervivencia."
+    },
+    "32": { // Destiny 2
+        en: "Destiny 2 is an action MMO with a single evolving world that you and your friends can join anytime, anywhere, absolutely free.",
+        es: "Destiny 2 es un MMO de acción con un mundo único en evolución al que tú y tus amigos podéis uniros en cualquier momento y lugar, totalmente gratis."
+    },
+    "4291": { // Counter-Strike: Global Offensive
+        en: "Counter-Strike: Global Offensive expands upon the team-based action gameplay that it pioneered when it was launched 19 years ago.",
+        es: "Counter-Strike: Global Offensive expande la jugabilidad de acción por equipos que fue pionera cuando se lanzó hace 19 años."
+    },
+    "13536": { // Portal 
+        en: "Portal is a new single-player game from Valve. Set in the mysterious Aperture Science Laboratories, Portal has been called one of the most innovative new games on the horizon.",
+        es: "Portal es un nuevo juego de Valve para un solo jugador. Ambientado en los misteriosos laboratorios de Aperture Science, Portal ha sido llamado uno de los juegos más innovadores del horizonte."
+    },
+    "12020": { // Left 4 Dead 2
+        en: "Set in the zombie apocalypse, Left 4 Dead 2 (L4D2) is the highly anticipated sequel to the award-winning Left 4 Dead.",
+        es: "Ambientado en el apocalipsis zombie, Left 4 Dead 2 (L4D2) es la esperada secuela del galardonado Left 4 Dead."
+    },
+    "802": { // Elden Ring
+        en: "Rise, Tarnished, and be guided by grace to brandish the power of the Elden Ring and become an Elden Lord in the Lands Between.",
+        es: "Levántate, Sinluz, y déjate guiar por la gracia para esgrimir el poder del Círculo de Elden y convertirte en un Señor de Elden en las Tierras Intermedias."
+    },
+    "28": { // Red Dead Redemption 2
+        en: "America, 1899. Arthur Morgan and the Van der Linde gang are outlaws on the run. With federal agents and the best bounty hunters in the nation massing on their heels.",
+        es: "América, 1899. Arthur Morgan y la banda de Van der Linde son forajidos en fuga. Con agentes federales y los mejores cazarrecompensas de la nación pisándoles los talones."
+    },
+    "4062": { // Bioshock Infinite
+        en: "Indebted to the wrong people, with his life on the line, veteran of the U.S. Cavalry and now hired gun Booker DeWitt has only one opportunity to wipe his slate clean.",
+        es: "Endeudado con la gente equivocada, con su vida en juego, el veterano de la Caballería de los EE. UU. y ahora mercenario Booker DeWitt sólo tiene una oportunidad de borrón y cuenta nueva."
+    },
+    "3439": { // Life is Strange
+        en: "Life is Strange is a five part episodic game that sets out to revolutionize story based choice and consequence games.",
+        es: "Life is Strange es un juego episódico de cinco partes que se propone revolucionar los juegos de elección y consecuencia basados en la historia."
+    },
+    "22509": { // Minecraft
+        en: "Prepare for an adventure of limitless possibilities as you build, mine, battle mobs, and explore the ever-changing Minecraft landscape.",
+        es: "Prepárate para una aventura de posibilidades ilimitadas mientras construyes, minas, luchas contra criaturas y exploras el paisaje de Minecraft en constante cambio."
+    }
+};
+
 function getGameImage(game) {
     const manualImages = {
         'minecraft': "https://images.igdb.com/igdb/image/upload/t_cover_big/co8fu7.webp",
@@ -482,8 +546,12 @@ function renderHome(filterGenre = undefined, isFromPopState = false) {
     }
 
     if (localGames.length === 0 && dynamicGames.length === 0 && detailedGames.length === 0) {
+        const message = currentState.discoveryGames.length === 0 && !currentState.initialLoadDone
+            ? (currentState.lang === 'es' ? 'Cargando biblioteca de juegos...' : 'Loading game library...')
+            : (currentState.lang === 'es' ? 'No se encontraron juegos para este género.' : 'No games found for this genre.');
+
         el.gameGrid.innerHTML += `<div style="grid-column: 1 / -1; text-align: center; padding: 5rem 2rem; background: var(--wiki-bg); border-radius: var(--radius); border: 1px dashed var(--border);">
-            <p style="font-size: 1.2rem; font-weight: 600; color: var(--text-muted);">${currentState.lang === 'es' ? 'No se encontraron juegos para este género.' : 'No games found for this genre.'}</p>
+            <p style="font-size: 1.2rem; font-weight: 600; color: var(--text-muted);">${message}</p>
         </div>`;
     }
 
