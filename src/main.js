@@ -117,8 +117,15 @@ let currentState = {
         year: null,
         developer: null
     },
+    dynamicDetails: {}, // Cache for games fetched individually by ID
     searchHistory: [],
-    selectedSearchIndex: -1 // For keyboard navigation
+    selectedSearchIndex: -1, // For keyboard navigation
+    // Discovery & Infinite Scroll
+    discoveryGames: [], // Games fetched from RAWG discovery
+    discoverPage: 1,
+    isFetching: false,
+    hasMore: true,
+    initialLoadDone: false
 };
 
 const UI_TEXT = {
@@ -243,7 +250,8 @@ const el = {
     heroTitle: document.getElementById('hero-title'),
     heroSubtitle: document.getElementById('hero-subtitle'),
     statGames: document.getElementById('stat-games'),
-    themeToggle: document.getElementById('theme-toggle')
+    themeToggle: document.getElementById('theme-toggle'),
+    loadMoreTrigger: document.getElementById('load-more-trigger')
 };
 
 // --- Initialization (moved to end of file) ---
@@ -392,13 +400,13 @@ function renderHome(filterGenre = undefined, isFromPopState = false) {
         history.pushState(state, "", "");
     }
 
+    // Restore scroll if needed
     setTimeout(() => {
-        if (typeof currentState.homeScrollY === 'number') {
+        if (typeof currentState.homeScrollY === 'number' && !isFromPopState) {
             window.scrollTo(0, currentState.homeScrollY);
         }
     }, 0);
 
-    // If filterGenre is null/string, update state. If undefined (lang toggle), use state.
     if (filterGenre !== undefined) {
         currentState.currentGenre = filterGenre;
     }
@@ -409,6 +417,11 @@ function renderHome(filterGenre = undefined, isFromPopState = false) {
     el.genreFilter.classList.remove('hidden');
     el.wikiContainer.classList.add('hidden');
 
+    // Show/hide loader trigger based on view and genre
+    if (el.loadMoreTrigger) {
+        el.loadMoreTrigger.style.display = activeGenre ? 'none' : 'flex';
+    }
+
     // Animation
     el.appContent.style.opacity = '0';
     el.appContent.style.transform = 'translateY(10px)';
@@ -418,15 +431,90 @@ function renderHome(filterGenre = undefined, isFromPopState = false) {
     el.appContent.style.transform = 'translateY(0)';
 
     document.title = activeGenre ? `Juegos de ${activeGenre} - GameWiki` : 'GameWiki - Tu Enciclopedia de Videojuegos';
-    if (!isFromPopState) window.scrollTo(0, 0);
+    if (!isFromPopState && !activeGenre) window.scrollTo(0, 0);
 
     // 1. Render Genre Filter Bar (Collapsible)
+    renderGenreFilter(activeGenre);
+
+    el.gameGrid.innerHTML = '';
+
+    // Add filter indicator
+    if (activeGenre) {
+        const indicator = document.createElement('div');
+        indicator.style.gridColumn = '1 / -1';
+        indicator.style.marginBottom = '2rem';
+        indicator.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: space-between; background: var(--wiki-bg); padding: 1rem 1.75rem; border-radius: var(--radius); border: 1px solid var(--primary); animation: slideDown 0.3s ease; box-shadow: 0 10px 30px var(--primary-glow);">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div style="width: 8px; height: 8px; background: var(--primary); border-radius: 50%;"></div>
+                    <span style="font-weight: 700;">${currentState.lang === 'es' ? 'Mostrando:' : 'Showing:'} <span style="color: var(--primary);">${activeGenre}</span></span>
+                </div>
+                <button onclick="filterByGenre(null)" style="background: var(--primary); color: white; border: none; padding: 0.5rem 1.25rem; border-radius: 50px; cursor: pointer; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem;">
+                    <span>${currentState.lang === 'es' ? 'Ver todo' : 'View all'}</span>
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+        `;
+        el.gameGrid.appendChild(indicator);
+    }
+
+    // 2. Identify games to render
+    const localGames = activeGenre
+        ? GAMES_DATA.filter(g => g.genre?.includes(activeGenre))
+        : GAMES_DATA;
+
+    // Filter discovery games to avoid duplicates with local data
+    const dynamicGames = (activeGenre
+        ? currentState.discoveryGames.filter(g => g.genres?.some(gen => gen.name.includes(activeGenre)))
+        : currentState.discoveryGames)
+        .filter(dg => !localGames.some(lg => lg.rawgId === dg.id || lg.title.toLowerCase() === dg.name.toLowerCase()));
+
+    // Special case: if we are in discovery mode and have dynamicDetails that match the genre
+    const detailedGames = [];
+    if (activeGenre) {
+        Object.values(currentState.dynamicDetails).forEach(game => {
+            if (game.genres?.some(g => g.name.includes(activeGenre))) {
+                if (!dynamicGames.some(dg => dg.id === game.id) && !localGames.some(lg => lg.rawgId === game.id)) {
+                    detailedGames.push(game);
+                }
+            }
+        });
+    }
+
+    if (localGames.length === 0 && dynamicGames.length === 0 && detailedGames.length === 0) {
+        el.gameGrid.innerHTML += `<div style="grid-column: 1 / -1; text-align: center; padding: 5rem 2rem; background: var(--wiki-bg); border-radius: var(--radius); border: 1px dashed var(--border);">
+            <p style="font-size: 1.2rem; font-weight: 600; color: var(--text-muted);">${currentState.lang === 'es' ? 'No se encontraron juegos para este género.' : 'No games found for this genre.'}</p>
+        </div>`;
+    }
+
+    // Render Local Games first
+    localGames.forEach(game => renderGameCard(game, el.gameGrid));
+
+    // Render Dynamic Games
+    dynamicGames.forEach(game => renderGameCard(transformRAWGToGame(game), el.gameGrid));
+    detailedGames.forEach(game => renderGameCard(transformRAWGToGame(game), el.gameGrid));
+
+    // Setup infinite scroll if we are in main home (no active genre)
+    if (!activeGenre && !currentState.initialLoadDone) {
+        setupInfiniteScroll();
+    }
+}
+
+/**
+ * Helper to render the genre filter bar
+ */
+function renderGenreFilter(activeGenre) {
     const allGenres = new Set();
     GAMES_DATA.forEach(game => {
         if (game.genre) {
             game.genre.split(',').forEach(g => allGenres.add(g.trim()));
         }
     });
+
+    // Fallback genres if GAMES_DATA is empty
+    if (allGenres.size === 0) {
+        ['Action', 'Adventure', 'RPG', 'Shooter', 'Indie', 'Strategy', 'Puzzle', 'Platformer', 'Sports', 'Racing', 'Fighting'].forEach(g => allGenres.add(g));
+    }
 
     const sortedGenres = Array.from(allGenres).sort();
     const isExpanded = currentState.isFilterExpanded;
@@ -454,73 +542,127 @@ function renderHome(filterGenre = undefined, isFromPopState = false) {
             </div>
         </div>
     `;
+}
 
-    el.gameGrid.innerHTML = '';
+/**
+ * Transforms RAWG API game object to GameWiki internal format
+ */
+function transformRAWGToGame(rawgGame) {
+    if (!rawgGame) return null;
+    const manual = MANUAL_DESCRIPTIONS[rawgGame.id.toString()];
+    const rawDesc = rawgGame.description_raw;
+    const hasValidDesc = rawDesc && rawDesc !== "undefined" && rawDesc.length > 10;
 
-    // Add a filter indicator if filtering
-    if (activeGenre) {
-        const indicator = document.createElement('div');
-        indicator.style.gridColumn = '1 / -1';
-        indicator.style.marginBottom = '2rem';
-        indicator.innerHTML = `
-            <div style="display: flex; align-items: center; justify-content: space-between; background: var(--wiki-bg); padding: 1rem 1.75rem; border-radius: var(--radius); border: 1px solid var(--primary); animation: slideDown 0.3s ease; box-shadow: 0 10px 30px var(--primary-glow);">
-                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                    <div style="width: 8px; height: 8px; background: var(--primary); border-radius: 50%;"></div>
-                    <span style="font-weight: 700;">${currentState.lang === 'es' ? 'Mostrando:' : 'Showing:'} <span style="color: var(--primary);">${activeGenre}</span></span>
-                </div>
-                <button onclick="filterByGenre(null)" style="background: var(--primary); color: white; border: none; padding: 0.5rem 1.25rem; border-radius: 50px; cursor: pointer; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem;">
-                    <span>${currentState.lang === 'es' ? 'Ver todo' : 'View all'}</span>
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
-                </button>
-            </div>
-        `;
-        el.gameGrid.appendChild(indicator);
-    }
+    const defaultDescEs = hasValidDesc ? (rawDesc.substring(0, 160) + "...") : "Descubre este increíble título en nuestra enciclopedia.";
+    const defaultDescEn = hasValidDesc ? (rawDesc.substring(0, 160) + "...") : "Discover this amazing title in our encyclopedia.";
 
-    const gamesToRender = activeGenre
-        ? GAMES_DATA.filter(g => g.genre.includes(activeGenre))
-        : GAMES_DATA;
-
-    if (gamesToRender.length === 0) {
-        el.gameGrid.innerHTML += `<div style="grid-column: 1 / -1; text-align: center; padding: 5rem 2rem; background: var(--wiki-bg); border-radius: var(--radius); border: 1px dashed var(--border);">
-            <p style="font-size: 1.2rem; font-weight: 600; color: var(--text-muted);">${currentState.lang === 'es' ? 'No se encontraron juegos para este género.' : 'No games found for this genre.'}</p>
-        </div>`;
-    }
-
-    gamesToRender.forEach(game => {
-        const enriched = currentState.enrichedData[game.id] || game.rawg;
-        const card = document.createElement('div');
-        card.className = 'game-card';
-        const isFav = isFavorite(game.id);
-
-        // Build rating and metacritic badges if available
-        let badgesHtml = '';
-        if (enriched) {
-            if (enriched.metacritic) {
-                const metaClass = enriched.metacritic >= 75 ? 'meta-high' : (enriched.metacritic >= 50 ? 'meta-mid' : 'meta-low');
-                badgesHtml += `<span class="meta-badge ${metaClass}">${enriched.metacritic}</span>`;
-            }
-            if (enriched.rating) {
-                badgesHtml += `<span class="rating-badge">★ ${enriched.rating.toFixed(1)}</span>`;
-            }
+    return {
+        id: `rawg-${rawgGame.id}`,
+        rawgId: rawgGame.id,
+        title: rawgGame.name,
+        description: {
+            es: manual?.es || defaultDescEs,
+            en: manual?.en || defaultDescEn
+        },
+        genre: rawgGame.genres?.map(g => g.name).join(', ') || '',
+        releaseDate: rawgGame.released || 'N/A',
+        image: rawgGame.background_image,
+        rawg: {
+            rating: rawgGame.rating,
+            metacritic: rawgGame.metacritic
         }
+    };
+}
 
-        card.innerHTML = `
-            <button class="favorite-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite('${game.id}')" title="${isFav ? UI_TEXT[currentState.lang].removeFromFavorites : UI_TEXT[currentState.lang].addToFavorites}">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                </svg>
-            </button>
-            <div class="game-icon">
-                <img src="${getGameImage(game)}" alt="${game.title}" loading="lazy">
-                ${badgesHtml}
-            </div>
-            <h3>${game.title}</h3>
-            <p>${game.description[currentState.lang]}</p>
-        `;
-        card.onclick = () => navigateToWiki(game.id);
-        el.gameGrid.appendChild(card);
-    });
+/**
+ * Helper to render a single game card
+ */
+function renderGameCard(game, container) {
+    const isFav = isFavorite(game.id);
+    const enriched = currentState.enrichedData[game.id] || game.rawg;
+
+    // Build rating and metacritic badges if available
+    let badgesHtml = '';
+    if (enriched) {
+        if (enriched.metacritic) {
+            const metaClass = enriched.metacritic >= 75 ? 'meta-high' : (enriched.metacritic >= 50 ? 'meta-mid' : 'meta-low');
+            badgesHtml += `<span class="meta-badge ${metaClass}">${enriched.metacritic}</span>`;
+        }
+        if (enriched.rating) {
+            badgesHtml += `<span class="rating-badge">★ ${enriched.rating.toFixed(1)}</span>`;
+        }
+    }
+
+    const card = document.createElement('div');
+    card.className = 'game-card';
+    card.innerHTML = `
+        <button class="favorite-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite('${game.id}')" title="${isFav ? UI_TEXT[currentState.lang].removeFromFavorites : UI_TEXT[currentState.lang].addToFavorites}">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+        </button>
+        <div class="game-icon">
+            <img src="${getGameImage(game)}" alt="${game.title}" loading="lazy">
+            ${badgesHtml}
+        </div>
+        <h3>${game.title}</h3>
+        <p>${game.description[currentState.lang] || '...'}</p>
+    `;
+    card.onclick = () => navigateToWiki(game.id);
+    container.appendChild(card);
+}
+
+/**
+ * Infinite Scroll logic using IntersectionObserver
+ */
+function setupInfiniteScroll() {
+    if (!el.loadMoreTrigger) return;
+
+    const observer = new IntersectionObserver(async (entries) => {
+        if (entries[0].isIntersecting && !currentState.isFetching && currentState.hasMore && currentState.view === 'home' && !currentState.currentGenre) {
+            await loadMoreGames();
+        }
+    }, { threshold: 0.1 });
+
+    observer.observe(el.loadMoreTrigger);
+    currentState.initialLoadDone = true;
+}
+
+/**
+ * Loads more games from RAWG and appends them
+ */
+async function loadMoreGames() {
+    currentState.isFetching = true;
+    el.loadMoreTrigger.classList.add('visible');
+
+    console.log(`🌐 Loading dynamic page ${currentState.discoverPage}...`);
+
+    try {
+        const data = await fetchDiscoverGames(currentState.discoverPage);
+        if (data && data.results) {
+            // Append only games not in discovery cache OR local database
+            const newGames = data.results.filter(g =>
+                !currentState.discoveryGames.find(dg => dg.id === g.id) &&
+                !GAMES_DATA.some(lg => lg.rawgId === g.id || lg.title.toLowerCase() === g.name.toLowerCase())
+            );
+            currentState.discoveryGames.push(...newGames);
+
+            // Render only the new batch
+            newGames.forEach(rawgGame => {
+                renderGameCard(transformRAWGToGame(rawgGame), el.gameGrid);
+            });
+
+            currentState.discoverPage++;
+            currentState.hasMore = !!data.next;
+        } else {
+            currentState.hasMore = false;
+        }
+    } catch (err) {
+        console.error('Failed to load more games:', err);
+    } finally {
+        currentState.isFetching = false;
+        el.loadMoreTrigger.classList.remove('visible');
+    }
 }
 
 function renderFavorites(activeCollection = 'favorites', isFromPopState = false) {
@@ -574,7 +716,11 @@ function renderFavorites(activeCollection = 'favorites', isFromPopState = false)
     el.gameGrid.innerHTML = '';
 
     const gamesInCollection = collections[activeCollection].games
-        .map(id => GAMES_DATA.find(g => g.id === id))
+        .map(id =>
+            GAMES_DATA.find(g => g.id === id) ||
+            transformRAWGToGame(currentState.discoveryGames.find(g => `rawg-${g.id}` === id)) ||
+            transformRAWGToGame(currentState.dynamicDetails[id.replace('rawg-', '')])
+        )
         .filter(g => g); // Filter out any undefined games
 
     if (gamesInCollection.length === 0) {
@@ -629,17 +775,40 @@ function navigateToWiki(id, isFromPopState = false) {
         window.scrollTo(0, 0);
     }
 
-    const item = GAMES_DATA.find(g => g.id === id) || COMPANIES_DATA.find(c => c.id === id);
+    const item = GAMES_DATA.find(g => g.id === id) ||
+        COMPANIES_DATA.find(c => c.id === id) ||
+        transformRAWGToGame(currentState.discoveryGames.find(g => `rawg-${g.id}` === id)) ||
+        transformRAWGToGame(currentState.dynamicDetails[id.replace('rawg-', '')]);
+
+    if (!item && id.startsWith('rawg-')) {
+        // Fetch from RAWG if not in local or discovery cache (e.g. direct link or refresh)
+        renderWikiLoading();
+        const rawgId = id.replace('rawg-', '');
+        getGameDetails(rawgId).then(details => {
+            if (details) {
+                // Store in dynamic cache so renderWiki can find it
+                currentState.dynamicDetails[rawgId] = details;
+                renderWiki();
+            } else {
+                renderHome();
+            }
+        });
+        return;
+    }
+
     if (item) document.title = `${item.title || item.name} - GameWiki`;
     renderWiki();
 }
 
 function renderWiki() {
     const id = currentState.currentId;
-    const game = GAMES_DATA.find(g => g.id === id);
+    const game = GAMES_DATA.find(g => g.id === id) ||
+        transformRAWGToGame(currentState.discoveryGames.find(g => `rawg-${g.id}` === id)) ||
+        transformRAWGToGame(currentState.dynamicDetails[id.replace('rawg-', '')]);
     const item = game || COMPANIES_DATA.find(c => c.id === id);
 
     if (!item) {
+        // Last attempt: check enriched data or fetch if missing (though navigateToWiki should have handled it)
         renderHome();
         return;
     }
@@ -867,16 +1036,18 @@ function renderWiki() {
             <p>
                 ${isGame
             ? (item.detailedHistory ? item.detailedHistory[currentState.lang] :
-                (currentState.lang === 'es'
-                    ? `Desde su lanzamiento en ${item.releaseDate}, ${item.title} ha sido un referente en el género de ${item.genre}. Desarrollado por ${renderInternalLink(item.companyId)}, el juego introdujo mecánicas innovadoras que cambiaron la industria.`
-                    : `Since its release in ${item.releaseDate}, ${item.title} has been a benchmark in the ${item.genre} genre. Developed by ${renderInternalLink(item.companyId)}, the game introduced innovative mechanics that changed the industry.`))
+                (MANUAL_DESCRIPTIONS[item.id.replace('rawg-', '')] ? MANUAL_DESCRIPTIONS[item.id.replace('rawg-', '')][currentState.lang] :
+                    (currentState.lang === 'es'
+                        ? `Desde su lanzamiento en ${item.releaseDate}, ${item.title} ha sido un referente en el género de ${item.genre}. Desarrollado por ${renderInternalLink(item.companyId)}, el juego introdujo mecánicas innovadoras que cambiaron la industria.`
+                        : `Since its release in ${item.releaseDate}, ${item.title} has been a benchmark in the ${item.genre} genre. Developed by ${renderInternalLink(item.companyId)}, the game introduced innovative mechanics that changed the industry.`)))
             : (currentState.lang === 'es'
                 ? `${item.name} ha moldeado la industria del videojuego a través de décadas de innovación y títulos legendarios.`
-                : `${item.name} has shaped the video game industry through decades of innovation and legendary titles.`)}
+                : `${item.name} has shaped the video game industry through decades of innovation and legendary titles.`)
+        }
             </p>
         </div>
 
-        ${isGame ? `
+    ${isGame ? `
             <div id="dev" style="margin-top: 2rem;">
                 <h2 style="border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; margin-bottom: 1rem;">${currentState.lang === 'es' ? 'Desarrollo' : 'Development'}</h2>
                 <p>
@@ -913,7 +1084,10 @@ function renderWiki() {
             <div id="catalog" style="margin-top: 3rem;">
                 <h2 style="border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; margin-bottom: 1rem;">${currentState.lang === 'es' ? 'Catálogo de Obras' : 'Catalog of Works'}</h2>
                 <ul class="game-list-horizontal" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem; list-style: none;">
-                    ${GAMES_DATA.filter(g => g.companyId === item.id).map(g => `
+                    ${[
+            ...GAMES_DATA.filter(g => g.companyId === item.id),
+            ...currentState.discoveryGames.filter(dg => dg.developers?.some(d => d.slug === item.id || d.name.toLowerCase() === item.name.toLowerCase())).map(transformRAWGToGame)
+        ].map(g => `
                         <li>
                             <div class="mini-card" onclick="window.dispatchEvent(new CustomEvent('nav', {detail: '${g.id}'}))">
                                 <img src="${getGameImage(g)}" alt="${g.title}" loading="lazy" style="width: 100%; height: 80px; object-fit: cover; border-radius: 4px; margin-bottom: 0.5rem;">
@@ -921,6 +1095,7 @@ function renderWiki() {
                             </div>
                         </li>
                     `).join('')}
+                    ${GAMES_DATA.filter(g => g.companyId === item.id).length === 0 && currentState.discoveryGames.filter(dg => dg.developers?.some(d => d.slug === item.id || d.name.toLowerCase() === item.name.toLowerCase())).length === 0 ? `<p style="color: var(--text-muted); font-size: 0.9rem;">${currentState.lang === 'es' ? 'No hay juegos vinculados en este momento.' : 'No games linked at this time.'}</p>` : ''}
                 </ul>
             </div>
         `}
@@ -937,6 +1112,12 @@ function renderWiki() {
     if (isGame) {
         loadRAWGSimilarGames(item);
         loadRAWGTrailers(item);
+
+        // Automatic enrichment if not already done
+        if (!currentState.enrichedData[item.id]) {
+            console.log(`✨ Automáticamente enriqueciendo datos para: ${item.title} `);
+            enrichSingleGame(item.id);
+        }
     }
 }
 
@@ -969,7 +1150,7 @@ function generateTableOfContents(item) {
                     </li>
                 `).join('')}
             </ul>
-        </div>
+        </div >
     `;
 }
 
@@ -978,7 +1159,7 @@ async function loadRAWGTrailers(item) {
 
     // Helper to hide TOC section
     const hideTOCSection = () => {
-        const tocLink = document.querySelector(`.toc-link[href="#trailers"]`);
+        const tocLink = document.querySelector(`.toc - link[href = "#trailers"]`);
         if (tocLink) {
             tocLink.closest('.toc-item')?.remove();
         }
@@ -1010,7 +1191,7 @@ async function loadRAWGTrailers(item) {
         }
 
         container.innerHTML = `
-            <section id="trailers" style="margin-top: 3rem;">
+    < section id = "trailers" style = "margin-top: 3rem;" >
                 <h2 style="border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; margin-bottom: 1.5rem;">
                     ${currentState.lang === 'es' ? 'Tráilers y Videos' : 'Trailers & Videos'}
                 </h2>
@@ -1029,8 +1210,8 @@ async function loadRAWGTrailers(item) {
                         </div>
                     `).join('')}
                 </div>
-            </section>
-        `;
+            </section >
+    `;
     } catch (e) {
         console.error('Failed to load trailers:', e);
         hideTOCSection();
@@ -1405,10 +1586,9 @@ async function loadRAWGSimilarGames(item) {
 window.navigateToSimilarGame = function (slug, name) {
     // 1. Try to find in our local database
     // We check by slug or title match
-    const match = GAMES_DATA.find(g =>
-        g.id === slug ||
-        g.title.toLowerCase() === name.toLowerCase()
-    );
+    const match = GAMES_DATA.find(g => g.id === slug || g.title.toLowerCase() === name.toLowerCase()) ||
+        transformRAWGToGame(currentState.discoveryGames.find(g => g.slug === slug || g.name.toLowerCase() === name.toLowerCase())) ||
+        transformRAWGToGame(Object.values(currentState.dynamicDetails).find(g => g.slug === slug || g.name.toLowerCase() === name.toLowerCase()));
 
     if (match) {
         navigateToWiki(match.id);
@@ -1434,6 +1614,37 @@ function renderInternalLink(companyId) {
 }
 
 // --- Mobile Sidebar Toggle ---
+function renderWikiLoading() {
+    el.wikiContainer.classList.remove('hidden');
+    el.hero.classList.add('hidden');
+    el.gameGrid.classList.add('hidden');
+    el.genreFilter.classList.add('hidden');
+    el.wikiArticle.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5rem 2rem;">
+            <div class="loading-spinner" style="width: 50px; height: 50px; margin-bottom: 2rem;"></div>
+            <p style="font-size: 1.2rem; font-weight: 600;">${currentState.lang === 'es' ? 'Cargando datos desde RAWG...' : 'Fetching data from RAWG...'}</p>
+        </div>
+    `;
+}
+
+function generateTableOfContents(item) {
+    if (!item || !item.id) return '';
+    return `
+        <div class="toc" id="toc">
+            <div class="toc-title">
+                <strong>${currentState.lang === 'es' ? 'Tabla de contenidos' : 'Contents'}</strong>
+                <span class="toc-toggle" onclick="document.getElementById('toc-list').classList.toggle('hidden')">${currentState.lang === 'es' ? '[ocultar]' : '[hide]'}</span>
+            </div>
+            <ul id="toc-list">
+                <li><a href="#intro">1 ${currentState.lang === 'es' ? 'Resumen' : 'Overview'}</a></li>
+                <li><a href="#history">2 ${currentState.lang === 'es' ? 'Historia' : 'History'}</a></li>
+                <li><a href="#dev">3 ${currentState.lang === 'es' ? 'Desarrollo' : 'Development'}</a></li>
+                ${item.relatedGames ? `<li><a href="#related">4 ${currentState.lang === 'es' ? 'Juegos Relacionados' : 'Related Games'}</a></li>` : ''}
+            </ul>
+        </div>
+    `;
+}
+
 window.toggleWikiSidebar = function () {
     const sidebar = el.wikiSidebar;
     sidebar.classList.toggle('mobile-active');
@@ -1515,7 +1726,11 @@ function setupEventListeners() {
             return;
         }
 
-        const filteredGames = GAMES_DATA.filter(g => g.title.toLowerCase().includes(query));
+        const filteredGames = [
+            ...GAMES_DATA.filter(g => g.title.toLowerCase().includes(query)),
+            ...currentState.discoveryGames.filter(g => g.name.toLowerCase().includes(query)).map(transformRAWGToGame)
+        ].filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i); // Unique
+
         const filteredCompanies = COMPANIES_DATA.filter(c => c.name.toLowerCase().includes(query));
 
         if (filteredGames.length || filteredCompanies.length) {
@@ -1607,6 +1822,11 @@ function initializeSearchFilters() {
     // 1. Populate Genre Select
     const genres = new Set();
     GAMES_DATA.forEach(g => g.genre.split(',').forEach(s => genres.add(s.trim())));
+
+    if (genres.size === 0) {
+        ['Action', 'Adventure', 'RPG', 'Shooter', 'Indie', 'Strategy', 'Puzzle', 'Platformer', 'Sports', 'Racing', 'Fighting'].forEach(g => genres.add(g));
+    }
+
     Array.from(genres).sort().forEach(g => {
         const opt = document.createElement('option');
         opt.value = g;
@@ -1620,6 +1840,12 @@ function initializeSearchFilters() {
         const year = g.releaseDate.split('-')[0];
         if (year) years.add(year);
     });
+
+    if (years.size === 0) {
+        const currentYear = new Date().getFullYear();
+        for (let y = currentYear; y >= currentYear - 15; y--) years.add(y.toString());
+    }
+
     Array.from(years).sort((a, b) => b - a).forEach(y => {
         const opt = document.createElement('option');
         opt.value = y;
@@ -1699,7 +1925,13 @@ function handleSearch(query) {
         return;
     }
 
-    let filteredGames = GAMES_DATA.filter(g => {
+    const gamesToSearch = [
+        ...GAMES_DATA,
+        ...currentState.discoveryGames.map(transformRAWGToGame),
+        ...Object.values(currentState.dynamicDetails).map(transformRAWGToGame)
+    ].filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i);
+
+    let filteredGames = gamesToSearch.filter(g => {
         const matchesQuery = !q || g.title.toLowerCase().includes(q);
         const matchesGenre = !filters.genre || g.genre.includes(filters.genre);
         const matchesYear = !filters.year || g.releaseDate.startsWith(filters.year);
@@ -1767,7 +1999,9 @@ function setupModalListeners() {
 }
 
 async function openDealsModal(gameId) {
-    const game = GAMES_DATA.find(g => g.id === gameId);
+    const game = GAMES_DATA.find(g => g.id === gameId) ||
+        transformRAWGToGame(currentState.discoveryGames.find(g => `rawg-${g.id}` === gameId)) ||
+        transformRAWGToGame(currentState.dynamicDetails[gameId.replace('rawg-', '')]);
     if (!game) return;
 
     const modal = document.getElementById('deals-modal');
@@ -1924,6 +2158,15 @@ function init() {
     setupEventListeners();
     setupModalListeners(); // Initialize modal handlers
 
+    // Load Discovery games from persistent cache if available
+    fetchDiscoverGames(1).then(data => {
+        if (data && data.results) {
+            currentState.discoveryGames = data.results;
+            currentState.discoverPage = 2; // Next page to load
+            if (currentState.view === 'home') renderHome(currentState.currentGenre, true);
+        }
+    });
+
     // Check URL params for deep linking
     const urlParams = new URLSearchParams(window.location.search);
     const game = urlParams.get('game');
@@ -2024,10 +2267,21 @@ window.testRAWG = async function () {
  * Usage: enrichSingleGame('elden-ring')
  */
 window.enrichSingleGame = async function (gameId) {
-    const game = GAMES_DATA.find(g => g.id === gameId);
+    const game = GAMES_DATA.find(g => g.id === gameId) ||
+        transformRAWGToGame(currentState.discoveryGames.find(g => `rawg-${g.id}` === gameId)) ||
+        transformRAWGToGame(currentState.dynamicDetails[gameId.replace('rawg-', '')]);
+
     if (!game) {
-        console.log('❌ Game not found:', gameId);
-        return;
+        console.log('🔍 Attempting to fetch from RAWG for enrichment:', gameId);
+        const rawgId = gameId.replace('rawg-', '');
+        const details = await getGameDetails(rawgId);
+        if (details) {
+            currentState.dynamicDetails[rawgId] = details;
+            // Now we proceed with enrichment of the freshly fetched details
+        } else {
+            console.log('❌ Game not found in any cache:', gameId);
+            return;
+        }
     }
 
     console.log(`🔍 Enriching: ${game.title}...`);
