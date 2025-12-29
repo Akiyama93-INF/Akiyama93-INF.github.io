@@ -22,7 +22,7 @@ Esta aplicación combina una base de datos meticulosa con una interfaz de vangua
 *   **Frontend**: HTML5 Semántico, CSS3 (Vanilla con variables modernas) y JavaScript ES6+.
 *   **API Integration**: Conectado con la API de **RAWG** para obtener datos, imágenes y vídeos en tiempo real.
 *   **Aesthetics**: Google Fonts (Inter & Montserrat) y micro-animaciones personalizadas.
-*   **Hosting**: Desplegado con amor en **GitHub Pages**.
+*   **Hosting**: Desplegado con amor en **Netlify**.
 
 ---
 
