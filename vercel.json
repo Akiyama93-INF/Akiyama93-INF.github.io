@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/api/rawg(.*)", "destination": "/api/rawg.js$1" }
+  ]
+}

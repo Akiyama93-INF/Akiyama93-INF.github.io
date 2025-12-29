@@ -700,6 +700,8 @@ function setupInfiniteScroll() {
  * Loads more games from RAWG and appends them
  */
 async function loadMoreGames() {
+    if (currentState.isFetching || !currentState.hasMore) return;
+
     currentState.isFetching = true;
     el.loadMoreTrigger.classList.add('visible');
 
@@ -707,26 +709,39 @@ async function loadMoreGames() {
 
     try {
         const data = await fetchDiscoverGames(currentState.discoverPage);
+
         if (data && data.results) {
             // Append only games not in discovery cache OR local database
             const newGames = data.results.filter(g =>
                 !currentState.discoveryGames.find(dg => dg.id === g.id) &&
                 !GAMES_DATA.some(lg => lg.rawgId === g.id || lg.title.toLowerCase() === g.name.toLowerCase())
             );
-            currentState.discoveryGames.push(...newGames);
 
-            // Render only the new batch
-            newGames.forEach(rawgGame => {
-                renderGameCard(transformRAWGToGame(rawgGame), el.gameGrid);
-            });
+            if (newGames.length > 0) {
+                currentState.discoveryGames.push(...newGames);
+                // Render only the new batch
+                newGames.forEach(rawgGame => {
+                    renderGameCard(transformRAWGToGame(rawgGame), el.gameGrid);
+                });
+            }
 
             currentState.discoverPage++;
             currentState.hasMore = !!data.next;
+
+            // Reset consecutive errors
+            currentState.consecutiveErrors = 0;
         } else {
             currentState.hasMore = false;
         }
     } catch (err) {
         console.error('Failed to load more games:', err);
+        currentState.consecutiveErrors = (currentState.consecutiveErrors || 0) + 1;
+
+        // If we hit too many errors, stop trying to avoid burning usage limits
+        if (currentState.consecutiveErrors > 3) {
+            console.warn('⚠️ Too many errors loading more games. Stopping infinite scroll.');
+            currentState.hasMore = false;
+        }
     } finally {
         currentState.isFetching = false;
         el.loadMoreTrigger.classList.remove('visible');
@@ -2227,12 +2242,15 @@ function init() {
     setupModalListeners(); // Initialize modal handlers
 
     // Load Discovery games from persistent cache if available
+    currentState.isFetching = true; // Block infinite scroll while initial fetch happens
     fetchDiscoverGames(1).then(data => {
         if (data && data.results) {
             currentState.discoveryGames = data.results;
             currentState.discoverPage = 2; // Next page to load
             if (currentState.view === 'home') renderHome(currentState.currentGenre, true);
         }
+    }).finally(() => {
+        currentState.isFetching = false;
     });
 
     // Check URL params for deep linking
