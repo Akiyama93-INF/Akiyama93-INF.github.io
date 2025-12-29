@@ -13,7 +13,9 @@
 const RAWG_CONFIG = {
     baseUrl: '/.netlify/functions/rawg', // Points to our Netlify serverless function
     cache: new Map(),
+    persistentCache: {}, // Loaded from localStorage
     cacheExpiry: 1000 * 60 * 60 * 24, // 24 hours
+    persistentKey: 'gamewiki_rawg_cache'
 };
 
 // ============================================================================
@@ -21,29 +23,65 @@ const RAWG_CONFIG = {
 // ============================================================================
 
 /**
+ * Load cache from localStorage
+ */
+function loadPersistentCache() {
+    const saved = localStorage.getItem(RAWG_CONFIG.persistentKey);
+    if (saved) {
+        try {
+            RAWG_CONFIG.persistentCache = JSON.parse(saved);
+            console.log('📦 Persistent cache loaded:', Object.keys(RAWG_CONFIG.persistentCache).length, 'items');
+        } catch (e) {
+            console.error('Failed to load persistent cache:', e);
+            RAWG_CONFIG.persistentCache = {};
+        }
+    }
+}
+
+/**
+ * Save current persistent cache to localStorage
+ */
+function savePersistentCache() {
+    localStorage.setItem(RAWG_CONFIG.persistentKey, JSON.stringify(RAWG_CONFIG.persistentCache));
+}
+
+/**
  * Get cached data if available and not expired
  */
 function getCachedData(key) {
+    // 1. Check in-memory session cache
     const cached = RAWG_CONFIG.cache.get(key);
-    if (!cached) return null;
-
-    const now = Date.now();
-    if (now - cached.timestamp > RAWG_CONFIG.cacheExpiry) {
+    if (cached) {
+        const now = Date.now();
+        if (now - cached.timestamp < RAWG_CONFIG.cacheExpiry) {
+            return cached.data;
+        }
         RAWG_CONFIG.cache.delete(key);
-        return null;
     }
 
-    return cached.data;
+    // 2. Check persistent cache
+    if (RAWG_CONFIG.persistentCache[key]) {
+        return RAWG_CONFIG.persistentCache[key];
+    }
+
+    return null;
 }
 
 /**
  * Cache data with timestamp
  */
-function setCachedData(key, data) {
+function setCachedData(key, data, persistent = false) {
+    // Save to session cache
     RAWG_CONFIG.cache.set(key, {
         data,
         timestamp: Date.now()
     });
+
+    // Save to persistent cache if requested
+    if (persistent) {
+        RAWG_CONFIG.persistentCache[key] = data;
+        savePersistentCache();
+    }
 }
 
 // ============================================================================
@@ -51,17 +89,20 @@ function setCachedData(key, data) {
 // ============================================================================
 
 /**
- * Make a request to RAWG API via the Vercel Proxy
+ * Make a request to RAWG API via the Netlify Proxy
  * @param {string} endpoint - API endpoint (e.g., '/games')
  * @param {object} params - Query parameters
+ * @param {boolean} persistent - Whether to cache result in localStorage
  * @returns {Promise<object>} API response data
  */
-async function rawgRequest(endpoint, params = {}) {
+async function rawgRequest(endpoint, params = {}, persistent = false) {
     // Build URL for our local proxy
     const url = new URL(window.location.origin + RAWG_CONFIG.baseUrl);
     url.searchParams.append('endpoint', endpoint);
 
-    Object.keys(params).forEach(key => {
+    // Sort keys to ensure consistent cache keys
+    const sortedKeys = Object.keys(params).sort();
+    sortedKeys.forEach(key => {
         if (params[key] !== null && params[key] !== undefined) {
             url.searchParams.append(key, params[key]);
         }
@@ -84,7 +125,7 @@ async function rawgRequest(endpoint, params = {}) {
         }
 
         const data = await response.json();
-        setCachedData(cacheKey, data);
+        setCachedData(cacheKey, data, persistent);
         return data;
 
     } catch (error) {
@@ -96,6 +137,25 @@ async function rawgRequest(endpoint, params = {}) {
 // ============================================================================
 // GAME SEARCH & DETAILS
 // ============================================================================
+
+/**
+ * Get popular games (Discovery)
+ * @param {number} page - Page number
+ * @param {number} pageSize - Games per page
+ * @returns {Promise<object>} RAWG response with games array
+ */
+async function fetchDiscoverGames(page = 1, pageSize = 20) {
+    // Fetch popular games from the last 10 years
+    const year = new Date().getFullYear();
+    const data = await rawgRequest('/games', {
+        page: page,
+        page_size: pageSize,
+        ordering: '-added',
+        dates: `2010-01-01,${year}-12-31`
+    }, true); // Persistent cache for lists
+
+    return data;
+}
 
 /**
  * Search for games by name
@@ -114,11 +174,11 @@ async function searchGames(query, pageSize = 10) {
 
 /**
  * Get detailed game information by ID
- * @param {number} gameId - RAWG game ID
+ * @param {number|string} gameId - RAWG game ID or slug
  * @returns {Promise<object>} Game details
  */
 async function getGameDetails(gameId) {
-    return await rawgRequest(`/games/${gameId}`);
+    return await rawgRequest(`/games/${gameId}`, {}, true); // Cache details personally
 }
 
 /**
@@ -162,7 +222,7 @@ async function findGameByName(gameName) {
 async function getGameScreenshots(gameId, count = 6) {
     const data = await rawgRequest(`/games/${gameId}/screenshots`, {
         page_size: count
-    });
+    }, true);
 
     return data?.results || [];
 }
@@ -173,7 +233,7 @@ async function getGameScreenshots(gameId, count = 6) {
  * @returns {Promise<Array>} Array of video objects
  */
 async function getGameTrailers(gameId) {
-    const data = await rawgRequest(`/games/${gameId}/movies`);
+    const data = await rawgRequest(`/games/${gameId}/movies`, {}, true);
     return data?.results || [];
 }
 
@@ -187,7 +247,7 @@ async function getGameTrailers(gameId) {
  * @returns {Promise<Array>} Array of related games
  */
 async function getGameSeries(gameId) {
-    const data = await rawgRequest(`/games/${gameId}/game-series`);
+    const data = await rawgRequest(`/games/${gameId}/game-series`, {}, true);
     return data?.results || [];
 }
 
@@ -197,7 +257,7 @@ async function getGameSeries(gameId) {
  * @returns {Promise<Array>} Array of DLC/additions
  */
 async function getGameDLC(gameId) {
-    const data = await rawgRequest(`/games/${gameId}/additions`);
+    const data = await rawgRequest(`/games/${gameId}/additions`, {}, true);
     return data?.results || [];
 }
 
@@ -228,6 +288,7 @@ async function enrichGameData(game) {
 
         // Get full details using the guaranteed ID
         const details = await getGameDetails(rawgId);
+        if (!details) return game;
 
         // Get screenshots
         const screenshots = await getGameScreenshots(rawgId, 6);
@@ -329,6 +390,8 @@ function getCoverImage(rawgGame, size = 'large') {
  */
 function clearRAWGCache() {
     RAWG_CONFIG.cache.clear();
+    RAWG_CONFIG.persistentCache = {};
+    localStorage.removeItem(RAWG_CONFIG.persistentKey);
     console.log('🗑️ RAWG cache cleared');
 }
 
@@ -338,9 +401,13 @@ function clearRAWGCache() {
 function getRAWGCacheStats() {
     return {
         entries: RAWG_CONFIG.cache.size,
+        persistentEntries: Object.keys(RAWG_CONFIG.persistentCache).length,
         expiryHours: RAWG_CONFIG.cacheExpiry / (1000 * 60 * 60)
     };
 }
+
+// Initialize cache on load
+loadPersistentCache();
 
 // ============================================================================
 // EXPORTS
