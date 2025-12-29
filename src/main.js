@@ -462,9 +462,11 @@ function renderHome(filterGenre = undefined, isFromPopState = false) {
         ? GAMES_DATA.filter(g => g.genre?.includes(activeGenre))
         : GAMES_DATA;
 
-    const dynamicGames = activeGenre
+    // Filter discovery games to avoid duplicates with local data
+    const dynamicGames = (activeGenre
         ? currentState.discoveryGames.filter(g => g.genres?.some(gen => gen.name.includes(activeGenre)))
-        : currentState.discoveryGames;
+        : currentState.discoveryGames)
+        .filter(dg => !localGames.some(lg => lg.rawgId === dg.id || lg.title.toLowerCase() === dg.name.toLowerCase()));
 
     if (localGames.length === 0 && dynamicGames.length === 0) {
         el.gameGrid.innerHTML += `<div style="grid-column: 1 / -1; text-align: center; padding: 5rem 2rem; background: var(--wiki-bg); border-radius: var(--radius); border: 1px dashed var(--border);">
@@ -533,8 +535,8 @@ function transformRAWGToGame(rawgGame) {
         rawgId: rawgGame.id,
         title: rawgGame.name,
         description: {
-            es: rawgGame.description_raw?.substring(0, 150) + "..." || "Descubre este increíble título en nuestra enciclopedia.",
-            en: rawgGame.description_raw?.substring(0, 150) + "..." || "Discover this amazing title in our encyclopedia."
+            es: rawgGame.description_raw ? (rawgGame.description_raw.substring(0, 150) + "...") : (currentState.lang === 'es' ? "Descubre este increíble título en nuestra enciclopedia." : "Discover this amazing title in our encyclopedia."),
+            en: rawgGame.description_raw ? (rawgGame.description_raw.substring(0, 150) + "...") : "Discover this amazing title in our encyclopedia."
         },
         genre: rawgGame.genres?.map(g => g.name).join(', ') || '',
         releaseDate: rawgGame.released || 'N/A',
@@ -612,8 +614,11 @@ async function loadMoreGames() {
     try {
         const data = await fetchDiscoverGames(currentState.discoverPage);
         if (data && data.results) {
-            // Append only new games
-            const newGames = data.results.filter(g => !currentState.discoveryGames.find(dg => dg.id === g.id));
+            // Append only games not in discovery cache OR local database
+            const newGames = data.results.filter(g =>
+                !currentState.discoveryGames.find(dg => dg.id === g.id) &&
+                !GAMES_DATA.some(lg => lg.rawgId === g.id || lg.title.toLowerCase() === g.name.toLowerCase())
+            );
             currentState.discoveryGames.push(...newGames);
 
             // Render only the new batch
