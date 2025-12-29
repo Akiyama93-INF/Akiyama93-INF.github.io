@@ -89,4 +89,4 @@ const COMPANIES_DATA = [
     }
 ];
 
-export { GAMES_DATA, COMPANIES_DATA };
+// End of data
