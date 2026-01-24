@@ -931,11 +931,16 @@ function renderWiki(isSilentUpdate = false) {
     const t = UI_TEXT[currentState.lang];
     const isGame = !!game;
 
+    // Check for requirements content to decide visibility
+    const enriched = isGame ? (currentState.enrichedData[item.id] || item.rawg) : null;
+    const requirementsHtml = isGame ? renderSystemRequirements(enriched) : '';
+    const hasRequirements = requirementsHtml.trim().length > 0;
+
     const visibleSections = [
         { id: 'intro', title: currentState.lang === 'es' ? 'Introducción' : 'Introduction', show: true },
         { id: 'gallery', title: currentState.lang === 'es' ? 'Galería' : 'Gallery', show: true },
         { id: 'achievements', title: currentState.lang === 'es' ? 'Logros' : 'Achievements', show: isGame },
-        { id: 'requirements', title: currentState.lang === 'es' ? 'Requerimientos' : 'Requirements', show: isGame },
+        { id: 'requirements', title: currentState.lang === 'es' ? 'Requerimientos' : 'Requirements', show: isGame && hasRequirements },
         { id: 'trailers', title: currentState.lang === 'es' ? 'Tráilers' : 'Trailers', show: isGame },
         { id: 'dlcs', title: currentState.lang === 'es' ? 'Contenido Adicional' : 'Additional Content', show: isGame },
         { id: 'history', title: currentState.lang === 'es' ? 'Historia' : 'History', show: true },
@@ -1156,7 +1161,7 @@ function renderWiki(isSilentUpdate = false) {
                         <!-- Dynamically filled Achievements from RAWG -->
                     </div>
 
-                    ${isGame ? renderSystemRequirements(currentState.enrichedData[item.id] || item.rawg) : ''}
+                    ${requirementsHtml}
 
                     <div id="trailers-container">
                         <!-- Dynamically filled Trailers from RAWG -->
@@ -1790,9 +1795,13 @@ function renderSystemRequirements(enriched) {
         : [];
 
     if (!hasSteam && (!enriched || !hasDetailedPlatforms || (hasDetailedPlatforms && requirements.length === 0))) {
+        // If we already have enriched data (meaning we attempted to fetch), but still no requirements,
+        // it likely means RAWG simply doesn't have them for this game. Hide the section.
+        if (enriched && (enriched.platforms || enriched.id)) {
+            return '';
+        }
 
-        // If no data, or old data format, or new format but no requirements found in RAWG
-        // We show the "Fetch" box unless we are SURE RAWG has nothing (which we can't be without trying)
+        // If no data yet, show the "Fetch" box
         return `
             <div class="fetch-req-box">
                 <div style="font-size: 2rem; margin-bottom: 1rem;">🔧</div>
