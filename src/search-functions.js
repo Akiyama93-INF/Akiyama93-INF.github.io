@@ -31,6 +31,11 @@ function clearSearchHistory() {
     saveSearchHistory();
 }
 
+function removeFromSearchHistory(query) {
+    currentState.searchHistory = currentState.searchHistory.filter(q => q !== query);
+    saveSearchHistory();
+}
+
 function getUniqueYears() {
     const years = new Set();
     GAMES_DATA.forEach(game => {

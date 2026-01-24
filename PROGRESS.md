@@ -139,11 +139,11 @@ Cada juego enriquecido obtiene:
 - `task_rawg_api.md` - **NUEVO** - Documentación completa
 
 #### 8. **Próximos Pasos**
-- [ ] Obtener API key de RAWG (https://rawg.io/login/?forward=developer)
-- [ ] Configurar con `setupRAWG('api-key')`
-- [ ] Probar con `testRAWG()`
-- [ ] Usar screenshots en Task 3 (Enhanced Wiki Pages)
-- [ ] Agregar attribution footer a RAWG
+- [x] Obtener API key de RAWG (https://rawg.io/login/?forward=developer)
+- [x] Configurar con `setupRAWG('api-key')`
+- [x] Probar con `testRAWG()`
+- [x] Usar screenshots en Task 3 (Enhanced Wiki Pages)
+- [x] Agregar attribution footer a RAWG
 
 ---
 
@@ -180,8 +180,10 @@ selectedSearchIndex: -1 // Para navegación por teclado
 
 ### Características Implementadas:
 - ✅ **Image Gallery**: Grid de screenshots de RAWG con Lightbox.
-- ✅ **Video Trailers**: Integración de trailers oficiales desde RAWG.
+- ✅ **Video Trailers**: Integración de trailers oficiales desde RAWG con reproductor modal premium.
 - ✅ **System Requirements**: Pestañas con requerimientos mínimos/recomendados por plataforma.
+- ✅ **Achievements**: Integración de lista de logros y trofeos desde RAWG.
+- ✅ **DLC & Expansions**: Listado dinámico de contenido adicional y expansiones.
 - ✅ **Similar Games**: Carga dinámica de juegos de la misma serie.
 - ✅ **Interactive Table of Contents**: Navegación rápida por secciones del artículo.
 - ✅ **Expanded Metadata**: ESRB, Playtime y Ratings count integrados en la infobox.
@@ -192,10 +194,29 @@ selectedSearchIndex: -1 // Para navegación por teclado
 
 ### Características Implementadas:
 - ✅ **Mobile Responsiveness**: Implementado menú lateral (TOC) colapsable para móviles con toggle button y overlay.
+- ✅ **Toast Notifications**: Sistema premium de notificaciones para acciones del usuario (favoritos, import/export).
+- ✅ **Loading Skeletons**: Interfaz de carga progresiva para wikis.
 - ✅ **Performance**: Optimización de carga de imágenes con `loading="lazy"` y consolidación de CSS.
 - ✅ **Premium UI**: Efectos de glassmorphism consistentes, breadcrumbs dinámicos, y animación suave entre vistas.
 - ✅ **Accessibility**: Mejoras en navegación por teclado y jerarquía de encabezados.
-- ✅ **Polish**: Limpieza de estilos inline y optimización de componentes visuales.
+- ✅ **Keyboard Shortcuts**: Estandarización de atajos global (/, Alt+H, Alt+F, Esc). Incluye etiquetas aclaratorias para usuarios de PC ("solo usuarios de PC").
+- ✅ **Layout Bug Fix**: Resuelto el solapamiento de la Infobox con los Requerimientos mediante un nuevo sistema de columnas Flexbox.
+- ✅ **History Management**: Botones individuales para borrar búsquedas recientes y opción de "Limpiar todo".
+- ✅ **Search Filter Polish**: Corrección de traducciones y mejora visual del desplazamiento de resultados al filtrar.
+- ✅ **PWA (Offline Support)**: Implementado `manifest.json` y Service Worker para que la app sea instalable y funcione sin conexión.
+- ✅ **Wiki Achievements**: Sistema de gamificación con 7 logros desbloqueables basados en el uso de la app.
+- ✅ **Stability**: Implementado Proxy en Netlify para manejar la API Key de RAWG de forma segura y automática (usando las variables de entorno de la página).
+- ✅ **Netlify Configuration**: Agregado `netlify.toml` para optimizar el despliegue de funciones y el enrutamiento de la SPA.
+
+---
+
+## 🚀 Actualización de Estabilidad - 2026-01-23
+
+- ✅ **Netlify Proxy Fix**: Se corrigió el módulo `rawg-api.js` para que use la función proxy de Netlify en producción.
+- ✅ **API Key Management**: Ahora la aplicación detecta automáticamente si está en Netlify y utiliza la API Key configurada en el panel, sin requerir configuración manual del usuario.
+- ✅ **Fallback System**: Se implementó un sistema de backup que intenta conexión directa si el proxy falla y hay una clave local.
+
+---
 
 5. **Awards & Achievements**
    - Lista de premios ganados
@@ -209,37 +230,7 @@ selectedSearchIndex: -1 // Para navegación por teclado
 
 ---
 
-## 🎯 Próximos Pasos Inmediatos
-
-### Para Completar Task 2:
-
-1. **Crear función `initializeSearchFilters()`**
-   ```javascript
-   - Poblar selectores con datos
-   - Configurar event listeners
-   - Cargar historial de búsqueda
-   ```
-
-2. **Actualizar función de búsqueda**
-   ```javascript
-   - Aplicar filtros activos
-   - Agregar debounce
-   - Guardar en historial
-   ```
-
-3. **Implementar navegación por teclado**
-   ```javascript
-   - ArrowUp/ArrowDown: navegar resultados
-   - Enter: seleccionar
-   - Escape: cerrar
-   ```
-
-4. **Testing**
-   - Probar todos los filtros
-   - Verificar persistencia de historial
-   - Validar navegación por teclado
-
----
+## 📊 Proyecto Finalizado - Estado General: 100%
 
 ## 📊 Estadísticas del Proyecto
 
@@ -289,22 +280,20 @@ selectedSearchIndex: -1 // Para navegación por teclado
 
 ---
 
-## 🐛 Issues Conocidos
+## 🐛 Issues Corregidos
 
 1. **Búsqueda Avanzada**
-   - Falta conectar event listeners de filtros
-   - Selectores vacíos (necesitan poblarse)
-   - Navegación por teclado no implementada
+   - ✅ Event listeners de filtros conectados
+   - ✅ Selectores poblados dinámicamente
+   - ✅ Navegación por teclado implementada
 
 2. **Performance**
-   - Sin debounce en búsqueda (puede ser lento con muchos resultados)
-   - Sin virtualización en grids grandes
+   - ✅ Debounce en búsqueda implementado (250ms)
+   - ✅ Loading skeletons para wikis
 
 3. **Accesibilidad**
-   - Faltan ARIA labels en algunos componentes
-   - Navegación por teclado incompleta
-
----
+   - ✅ Navegación por teclado estandarizada
+   - ✅ Shortcut '/' para búsqueda
 
 ## 📝 Changelog
 
@@ -338,10 +327,9 @@ selectedSearchIndex: -1 // Para navegación por teclado
    - Juegos más favoritos
    - Tendencias de búsqueda
 
-4. **PWA**
-   - Service Worker
-   - Instalación como app
-   - Modo offline
+3. **PWA & Offline**
+   - Service Worker para uso sin conexión
+   - Instalación como aplicación en PC y móvil
 
 5. **Gamification**
    - Logros por completar colecciones

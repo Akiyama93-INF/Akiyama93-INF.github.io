@@ -1,163 +1,3 @@
-const STEAM_APP_IDS = {
-    // Classics & Valve
-    "half-life": 70, "half-life-2": 220, "portal": 400, "portal-2": 620,
-    "left-4-dead-2": 550, "team-fortress-2": 440, "dota2": 570, "csgo": 730,
-
-    // Horror & Capcom
-    "resident-evil": 304240, "resident-evil-2": 883710, "resident-evil-3": 952060,
-    "resident-evil-4": 2050650, "resident-evil-7": 418370, "resident-evil-village": 1196590,
-    "the-walking-dead": 207610, "the-walking-dead-definitive": 1449690,
-    "devil-may-cry-5": 601150, "monster-hunter-world": 582010, "street-fighter-6": 1364780,
-
-    // RPG & Open World
-    "elden-ring": 1245620, "baldurs-gate-3": 1086940, "the-witcher-3": 292030,
-    "cyberpunk-2077": 1091500, "skyrim": 489830, "skyrim-ae": 489830,
-    "fallout-4": 377160, "fallout-nv": 22380, "starfield": 1716740, "dragon-age-inquisition": 1222690,
-    "mass-effect": 1324350, "mass-effect-2": 24960, "mass-effect-3": 1238020,
-    "dark-souls-3": 374320, "sekiro": 814380, "bioshock": 7670, "bioshock-infinite": 8870,
-
-    // Rockstar & Action
-    "gta-v": 271590, "red-dead-redemption-2": 1174180, "max-payne-3": 204100,
-
-    // Playstation Studios
-    "horizon-zero-dawn": 1151640, "god-of-war": 1593500, "god-of-war-ragnarok": 2322010,
-    "spider-man-ps4": 1817070, "death-stranding": 1190460, "ghost-of-tsushima": 2215430,
-    "the-last-of-us": 1888160, "the-last-of-us-1": 1888160, "uncharted-4": 1659420, "uncharted-legacy": 1659420,
-
-    // Indie & Others
-    "hollow-knight": 367520, "celeste": 504230, "hades": 1145360, "stray": 1332010,
-    "undertale": 391540, "deltarune": 1671210, "rust": 252490, "terraria": 105600, "stardew-valley": 413150,
-    "among-us": 945360, "phasmophobia": 739630, "valheim": 892970,
-
-    // EA & Ubisoft
-    "battlefield-2042": 1517290, "the-sims-4": 1222670, "watch-dogs-2": 447040,
-    "far-cry-6": 2369390, "assassins-creed-odyssey": 812140, "assassins-creed-valhalla": 2208920,
-    "star-wars-jedi": 1172380, "star-wars-jedi-survivor": 1774580, "it-takes-two": 1426210, "dead-space-remake": 1693980,
-
-    // Fighting & Anime
-    "tekken-8": 1778820, "mortal-kombat-11": 976310, "persona-5": 1687950,
-    "yakuza-0": 638970, "nioh-2": 1325200, "nier-automata": 524220,
-    "silent-hill-2": 2124490, "metal-gear-solid-3": 2131650, "final-fantasy-vii": 39140,
-    "catherine-classic": 893180, "persona-3-reload": 2161700, "persona-4-golden": 1113000, "persona-5-strikers": 1382330,
-
-    // Bethesda & Arkane
-    "doom-eternal": 782330, "wolfenstein-2": 612880, "control": 870780,
-    "dishonored-2": 403640, "prey": 480490, "deathloop": 1252330,
-
-    // Classics & Xbox
-    "halo-ce": 1064220, "halo-infinite": 1240440, "sea-of-thieves": 1172620,
-
-    // Multiplayer Free to Play (Served via Steam)
-    "apex": 1172470, "overwatch-2": 2357570, "destiny-2": 1085660, "warframe": 230410,
-    "apex-legends": 1172470, "counter-strike": 730, "dota-2": 570,
-
-    // Others
-    "diablo-iv": 2344520, "overwatch-2": 2357570, "destiny-2": 1085660, "warframe": 230410,
-    "it-takes-two": 1426210, "dead-space-remake": 1693980, "cuphead": 268910, "outer-wilds": 753640,
-    "a-way-out": 1222700, "brothers-a-tale-of-two-sons": 225080,
-    "palworld": 1623730, "balatro": 2379780, "sonic-frontiers": 1237320, "metal-gear-rising": 235460,
-    "nier-replicant": 1113560,
-    "spider-man-miles-morales": 1817190, "horizon-forbidden-west": 2420110, "ratchet-clank-rift": 1895880,
-    "returnal": 1649240, "sackboy-adventure": 1599660, "bioshock-2": 409710, "resident-evil-7": 418370,
-    "mass-effect-3": 1238020
-};
-
-const MANUAL_DESCRIPTIONS = {
-    // Top Games
-    "3498": { // GTA V
-        en: "Experience Rockstar Games' critically acclaimed open-world phenomenon. Explore the sprawling metropolis of Los Santos and the wilderness of Blaine County in the ultimate Grand Theft Auto experience.",
-        es: "Experimenta el fenómeno de mundo abierto de Rockstar Games. Explora la metrópolis de Los Santos y el desierto del condado de Blaine en la experiencia definitiva de Grand Theft Auto."
-    },
-    "3328": { // The Witcher 3
-        en: "The Witcher: Wild Hunt is a story-driven open world RPG set in a visually stunning fantasy universe full of meaningful choices and impactful consequences.",
-        es: "The Witcher: Wild Hunt es un RPG de mundo abierto centrado en la historia, ambientado en un universo de fantasía visualmente impresionante lleno de decisiones significativas."
-    },
-    "4200": { // Portal 2
-        en: "The sequel to the ground-breaking hit that blended gaming, science, and surprise. Portal 2 draws from the award-winning formula of innovative gameplay, story, and music.",
-        es: "La secuela del éxito revolucionario que mezcló juegos, ciencia y sorpresa. Portal 2 se basa en la fórmula premiada de jugabilidad innovadora, historia y música."
-    },
-    "5286": { // Tomb Raider
-        en: "Tomb Raider explores the intense and gritty origin story of Lara Croft and her ascent from a young woman to a hardened survivor.",
-        es: "Tomb Raider explora la intensa y cruda historia del origen de Lara Croft y su ascenso de una mujer joven a una superviviente endurecida."
-    },
-    "5679": { // Skyrim
-        en: "The next chapter in the highly anticipated Elder Scrolls saga. Skyrim reimagines and revolutionizes the open-world fantasy epic, bringing to life a complete virtual world.",
-        es: "El siguiente capítulo de la muy esperada saga Elder Scrolls. Skyrim reinventa y revoluciona la epopeya fantástica de mundo abierto, dando vida a un mundo virtual completo."
-    },
-    "422": { // Cyberpunk 2077
-        en: "Cyberpunk 2077 is an open-world, action-adventure RPG set in the megalopolis of Night City, where you play as a cyberpunk mercenary wrapped up in a do-or-die fight for survival.",
-        es: "Cyberpunk 2077 es un RPG de acción y aventura de mundo abierto ambientado en la megalópolis de Night City, donde juegas como un mercenario cyberpunk en una lucha por la supervivencia."
-    },
-    "32": { // Destiny 2
-        en: "Destiny 2 is an action MMO with a single evolving world that you and your friends can join anytime, anywhere, absolutely free.",
-        es: "Destiny 2 es un MMO de acción con un mundo único en evolución al que tú y tus amigos podéis uniros en cualquier momento y lugar, totalmente gratis."
-    },
-    "4291": { // Counter-Strike: Global Offensive
-        en: "Counter-Strike: Global Offensive expands upon the team-based action gameplay that it pioneered when it was launched 19 years ago.",
-        es: "Counter-Strike: Global Offensive expande la jugabilidad de acción por equipos que fue pionera cuando se lanzó hace 19 años."
-    },
-    "13536": { // Portal 
-        en: "Portal is a new single-player game from Valve. Set in the mysterious Aperture Science Laboratories, Portal has been called one of the most innovative new games on the horizon.",
-        es: "Portal es un nuevo juego de Valve para un solo jugador. Ambientado en los misteriosos laboratorios de Aperture Science, Portal ha sido llamado uno de los juegos más innovadores del horizonte."
-    },
-    "12020": { // Left 4 Dead 2
-        en: "Set in the zombie apocalypse, Left 4 Dead 2 (L4D2) is the highly anticipated sequel to the award-winning Left 4 Dead.",
-        es: "Ambientado en el apocalipsis zombie, Left 4 Dead 2 (L4D2) es la esperada secuela del galardonado Left 4 Dead."
-    },
-    "802": { // Elden Ring
-        en: "Rise, Tarnished, and be guided by grace to brandish the power of the Elden Ring and become an Elden Lord in the Lands Between.",
-        es: "Levántate, Sinluz, y déjate guiar por la gracia para esgrimir el poder del Círculo de Elden y convertirte en un Señor de Elden en las Tierras Intermedias."
-    },
-    "28": { // Red Dead Redemption 2
-        en: "America, 1899. Arthur Morgan and the Van der Linde gang are outlaws on the run. With federal agents and the best bounty hunters in the nation massing on their heels.",
-        es: "América, 1899. Arthur Morgan y la banda de Van der Linde son forajidos en fuga. Con agentes federales y los mejores cazarrecompensas de la nación pisándoles los talones."
-    },
-    "4062": { // Bioshock Infinite
-        en: "Indebted to the wrong people, with his life on the line, veteran of the U.S. Cavalry and now hired gun Booker DeWitt has only one opportunity to wipe his slate clean.",
-        es: "Endeudado con la gente equivocada, con su vida en juego, el veterano de la Caballería de los EE. UU. y ahora mercenario Booker DeWitt sólo tiene una oportunidad de borrón y cuenta nueva."
-    },
-    "3439": { // Life is Strange
-        en: "Life is Strange is a five part episodic game that sets out to revolutionize story based choice and consequence games.",
-        es: "Life is Strange es un juego episódico de cinco partes que se propone revolucionar los juegos de elección y consecuencia basados en la historia."
-    },
-    "22509": { // Minecraft
-        en: "Prepare for an adventure of limitless possibilities as you build, mine, battle mobs, and explore the ever-changing Minecraft landscape.",
-        es: "Prepárate para una aventura de posibilidades ilimitadas mientras construyes, minas, luchas contra criaturas y exploras el paisaje de Minecraft en constante cambio."
-    }
-};
-
-function getGameImage(game) {
-    const manualImages = {
-        'minecraft': "https://images.igdb.com/igdb/image/upload/t_cover_big/co8fu7.webp",
-        'league-of-legends': "https://images.igdb.com/igdb/image/upload/t_cover_big/coabh7.webp",
-        'valorant': "https://images.igdb.com/igdb/image/upload/t_cover_big/coau39.webp",
-        'fortnite': "https://images.igdb.com/igdb/image/upload/t_cover_big/coaxt6.webp",
-        'zelda-botw': "https://images.igdb.com/igdb/image/upload/t_cover_big/co3p2d.webp",
-        'mario-odyssey': "https://images.igdb.com/igdb/image/upload/t_cover_big/co1mxf.webp",
-        'alan-wake-2': "https://images.igdb.com/igdb/image/upload/t_cover_big/co6jar.webp",
-        'bloodborne': "https://images.igdb.com/igdb/image/upload/t_cover_big/co1rba.webp",
-        'dark-souls': "https://images.igdb.com/igdb/image/upload/t_cover_big/co1x78.webp",
-        'unreal-tournament': "https://images.igdb.com/igdb/image/upload/t_cover_big/co1i2j.webp",
-        'undertale': "https://images.igdb.com/igdb/image/upload/t_cover_big/cob1t2.webp",
-        'deltarune': "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1671210/header.jpg",
-        'terraria': "https://images.igdb.com/igdb/image/upload/t_cover_big/coaamg.webp",
-        'the-last-of-us': "https://images.igdb.com/igdb/image/upload/t_cover_big/coa1gq.webp",
-        'uncharted-4': "https://images.igdb.com/igdb/image/upload/t_cover_big/co1r7h.webp",
-        'world-of-warcraft': "https://images.igdb.com/igdb/image/upload/t_cover_big/co2l7z.webp",
-        'hearthstone': "https://images.igdb.com/igdb/image/upload/t_cover_big/co1sh2.webp",
-        'the-last-of-us-2': "https://images.igdb.com/igdb/image/upload/t_cover_big/co5ziw.webp"
-    };
-    if (manualImages[game.id]) return manualImages[game.id];
-    if (game.image) return game.image; // Use manual override if exists
-    const appId = STEAM_APP_IDS[game.id];
-    if (appId) {
-        // Steam images are served over Cloudflare's edge network
-        return `https://cdn.cloudflare.steamstatic.com/steam/apps/${appId}/header.jpg`;
-    }
-    // Fallback to stylized abstract shapes using DiceBear
-    return `https://api.dicebear.com/7.x/identicon/svg?seed=${game.id}`;
-}
-
 // --- State Management ---
 let currentState = {
     lang: 'es', // 'en' or 'es'
@@ -241,7 +81,21 @@ const UI_TEXT = {
         searchHistory: "Historial de Búsqueda",
         clearHistory: "Limpiar Historial",
         noResults: "No se encontraron resultados",
-        showing: "Mostrando"
+        showing: "Mostrando",
+        allGenres: "Todos los Géneros",
+        allYears: "Todos los Años",
+        allDevelopers: "Todos los Desarrolladores",
+        clearFilters: "Limpiar Filtros",
+        kbdShortcuts: "Atajos de Teclado (solo usuarios de PC)",
+        kbdSearch: "Buscar juegos",
+        kbdHome: "Ir al Inicio",
+        kbdFavs: "Mis Favoritos",
+        kbdEsc: "Cerrar ventanas / búsqueda",
+        kbdNav: "Navegar resultados",
+        kbdEnter: "Seleccionar resultado",
+        achievements: "Logros de la Wiki",
+        markAsCompleted: "Marcar como Completado",
+        removeFromCompleted: "Quitar de Completados"
     },
     en: {
         heroTitle: "Explore Gaming History",
@@ -278,6 +132,8 @@ const UI_TEXT = {
         importFavorites: "Import Favorites",
         collections: "Collections",
         allCollections: "All Collections",
+        markAsCompleted: "Mark as Completed",
+        removeFromCompleted: "Remove from Completed",
         // Search Filters
         advancedSearch: "Advanced Search",
         filters: "Filters",
@@ -291,7 +147,19 @@ const UI_TEXT = {
         searchHistory: "Search History",
         clearHistory: "Clear History",
         noResults: "No results found",
-        showing: "Showing"
+        showing: "Showing",
+        allGenres: "All Genres",
+        allYears: "All Years",
+        allDevelopers: "All Developers",
+        clearFilters: "Clear Filters",
+        kbdShortcuts: "Keyboard Shortcuts (only for PC users)",
+        kbdSearch: "Search games",
+        kbdHome: "Go Home",
+        kbdFavs: "My Favorites",
+        kbdEsc: "Close modals / search",
+        kbdNav: "Navigate results",
+        kbdEnter: "Select result",
+        achievements: "Wiki Achievements"
     }
 };
 
@@ -315,21 +183,18 @@ const el = {
     heroSubtitle: document.getElementById('hero-subtitle'),
     statGames: document.getElementById('stat-games'),
     themeToggle: document.getElementById('theme-toggle'),
-    loadMoreTrigger: document.getElementById('load-more-trigger')
+    loadMoreTrigger: document.getElementById('load-more-trigger'),
+    toastContainer: document.getElementById('toast-container'),
+    kbdShortcutsBtn: document.getElementById('kbd-shortcuts-btn'),
+    kbdModal: document.getElementById('kbd-modal'),
+    achievementsBtn: document.getElementById('achievements-btn'),
+    achievementsModal: document.getElementById('achievements-modal')
 };
 
 // --- Initialization (moved to end of file) ---
 
 // --- Logic ---
-function updateUILabels() {
-    const t = UI_TEXT[currentState.lang];
-    el.langText.innerText = currentState.lang === 'es' ? 'EN' : 'ES';
-    el.search.placeholder = t.searchPlaceholder;
-    el.heroTitle.innerText = t.heroTitle;
-    el.heroSubtitle.innerText = t.heroSubtitle;
-    el.statGames.innerText = t.statGames;
-    document.documentElement.lang = currentState.lang;
-}
+// Redundant definition removed
 
 window.filterByGenre = function (genre) {
     currentState.view = 'home';
@@ -366,16 +231,29 @@ function toggleFavorite(gameId, collection = 'favorites') {
 
     if (index > -1) {
         collectionArray.splice(index, 1);
+        showToast(currentState.lang === 'es' ? 'Eliminado de favoritos' : 'Removed from favorites', 'info');
     } else {
         collectionArray.push(gameId);
+        showToast(currentState.lang === 'es' ? 'Añadido a favoritos' : 'Added to favorites', 'success');
     }
 
     saveFavorites();
     updateFavoritesCount();
 
+    // Preserve scroll position if we are re-rendering the same view
+    if (currentState.view === 'home') {
+        currentState.homeScrollY = window.scrollY;
+    }
+
+    // Achievement Stats updates
+    if (typeof updateStat === 'function') {
+        updateStat('favoritesCount', currentState.favorites.favorites.length);
+        updateStat('gamesCompleted', currentState.favorites.completed.length);
+    }
+
     // Update UI if we're on the current game's wiki page
     if (currentState.view === 'wiki' && currentState.currentId === gameId) {
-        renderWiki();
+        renderWiki(true); // true for 'isSilentUpdate'
     }
 
     // Update UI if we're on favorites view
@@ -385,7 +263,7 @@ function toggleFavorite(gameId, collection = 'favorites') {
 
     // Update UI if we're on home view
     if (currentState.view === 'home') {
-        renderHome(currentState.currentGenre);
+        renderHome(currentState.currentGenre, false, true); // true for 'isSilentUpdate'
     }
 }
 
@@ -420,9 +298,9 @@ function importFavorites() {
                     if (currentState.view === 'favorites') {
                         renderFavorites();
                     }
-                    alert(currentState.lang === 'es' ? 'Favoritos importados exitosamente' : 'Favorites imported successfully');
+                    showToast(currentState.lang === 'es' ? 'Favoritos importados exitosamente' : 'Favorites imported successfully', 'success');
                 } catch (error) {
-                    alert(currentState.lang === 'es' ? 'Error al importar favoritos' : 'Error importing favorites');
+                    showToast(currentState.lang === 'es' ? 'Error al importar favoritos' : 'Error importing favorites', 'error');
                 }
             };
             reader.readAsText(file);
@@ -445,6 +323,33 @@ function updateFavoritesCount() {
 }
 
 
+function showToast(message, type = 'info') {
+    if (!el.toastContainer) return;
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+
+    const icons = {
+        success: '✅',
+        error: '❌',
+        info: 'ℹ️'
+    };
+
+    toast.innerHTML = `
+        <span class="toast-icon">${icons[type] || 'ℹ️'}</span>
+        <span class="toast-message">${message}</span>
+    `;
+
+    el.toastContainer.appendChild(toast);
+
+    // Auto remove
+    setTimeout(() => {
+        toast.classList.add('removing');
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+}
+
+
 function updateUILabels() {
     const t = UI_TEXT[currentState.lang];
     el.heroTitle.innerText = t.heroTitle;
@@ -452,24 +357,54 @@ function updateUILabels() {
     el.statGames.innerText = t.statGames;
     el.search.placeholder = t.searchPlaceholder;
     el.langText.innerText = currentState.lang === 'es' ? 'EN' : 'ES'; // Muestra a qué cambiará
+
+    // Keybinds Modal
+    const kbdBtn = document.getElementById('kbd-shortcuts-btn');
+    if (kbdBtn) kbdBtn.title = t.kbdShortcuts;
+
+    const kbdTitle = document.getElementById('kbd-modal-title');
+    if (kbdTitle) kbdTitle.innerText = t.kbdShortcuts;
+    document.querySelectorAll('.kbd-desc').forEach(desc => {
+        const key = desc.getAttribute('data-key');
+        if (t[key]) desc.innerText = t[key];
+    });
+
+    // Search Filters Selects - Update first option
+    const genreSelect = document.getElementById('filter-genre');
+    const yearSelect = document.getElementById('filter-year');
+    const devSelect = document.getElementById('filter-developer');
+    const clearFiltersBtn = document.getElementById('clear-filters-btn');
+
+    if (genreSelect && genreSelect.options[0]) genreSelect.options[0].text = t.allGenres;
+    if (yearSelect && yearSelect.options[0]) yearSelect.options[0].text = t.allYears;
+    if (devSelect && devSelect.options[0]) devSelect.options[0].text = t.allDevelopers;
+    if (clearFiltersBtn) clearFiltersBtn.innerText = t.clearFilters;
+
+    // Achievements
+    if (el.achievementsBtn) el.achievementsBtn.title = t.achievements;
+    const achTitle = document.getElementById('ach-modal-title');
+    if (achTitle) achTitle.innerText = t.achievements;
 }
 
-function renderHome(filterGenre = undefined, isFromPopState = false) {
-    currentState.view = 'home';
-    document.title = "GameWiki - Home";
+function renderHome(filterGenre = undefined, isFromPopState = false, isSilentUpdate = false) {
+    // If it's a silent update, we don't change the view state or push history
+    if (!isSilentUpdate) {
+        currentState.view = 'home';
+        document.title = "GameWiki - Home";
 
-    // Handle History
-    if (!isFromPopState) {
-        const state = { view: 'home', genre: filterGenre || currentState.currentGenre };
-        history.pushState(state, "", "");
-    }
-
-    // Restore scroll if needed
-    setTimeout(() => {
-        if (typeof currentState.homeScrollY === 'number' && !isFromPopState) {
-            window.scrollTo(0, currentState.homeScrollY);
+        // Handle History
+        if (!isFromPopState) {
+            const state = { view: 'home', genre: filterGenre || currentState.currentGenre };
+            history.pushState(state, "", "");
         }
-    }, 0);
+
+        // Restore scroll if needed
+        setTimeout(() => {
+            if (typeof currentState.homeScrollY === 'number' && !isFromPopState) {
+                window.scrollTo(0, currentState.homeScrollY);
+            }
+        }, 0);
+    }
 
     if (filterGenre !== undefined) {
         currentState.currentGenre = filterGenre;
@@ -495,7 +430,7 @@ function renderHome(filterGenre = undefined, isFromPopState = false) {
     el.appContent.style.transform = 'translateY(0)';
 
     document.title = activeGenre ? `Juegos de ${activeGenre} - GameWiki` : 'GameWiki - Tu Enciclopedia de Videojuegos';
-    if (!isFromPopState && !activeGenre) window.scrollTo(0, 0);
+    if (!isFromPopState && !activeGenre && !isSilentUpdate) window.scrollTo(0, 0);
 
     // 1. Render Genre Filter Bar (Collapsible)
     renderGenreFilter(activeGenre);
@@ -613,31 +548,91 @@ function renderGenreFilter(activeGenre) {
 }
 
 /**
+ * Detects if a text is likely English
+ */
+function isEnglishText(text) {
+    if (!text) return true;
+    const commonEnglish = [' the ', ' is ', ' and ', ' with ', ' from ', ' game ', ' features '];
+    const lower = text.toLowerCase();
+    return commonEnglish.some(word => lower.includes(word));
+}
+
+/**
+ * Generates a professional summary in the target language based on game metadata
+ */
+function generateLocalizedSummary(rawgGame, lang) {
+    const isEs = lang === 'es';
+    const name = rawgGame.name;
+    const year = rawgGame.released ? rawgGame.released.split('-')[0] : (isEs ? 'fecha desconocida' : 'unknown date');
+    const genre = rawgGame.genres?.[0]?.name || (isEs ? 'videojuegos' : 'video games');
+    const dev = rawgGame.developers?.[0]?.name || (isEs ? 'un estudio destacado' : 'a prominent studio');
+    const platforms = rawgGame.platforms?.slice(0, 3).map(p => p.platform.name).join(', ') || 'N/A';
+    const rating = rawgGame.rating ? `${rawgGame.rating}/5✮` : '';
+    const metacritic = rawgGame.metacritic ? `Metacritic: ${rawgGame.metacritic}` : '';
+
+    if (isEs) {
+        return `${name} es una experiencia imprescindible dentro del género ${genre}. Lanzado originalmente en ${year} y desarrollado por ${dev}, el título ha sido aclamado por su apartado técnico y jugabilidad en plataformas como ${platforms}. ${rating ? `Con una puntuación de ${rating},` : ''} se posiciona como una obra clave que expande los horizontes de su categoría. ${metacritic ? `La crítica especializada lo ha respaldado con un ${metacritic}.` : ''}`;
+    } else {
+        return `${name} is an essential experience within the ${genre} genre. Originally released in ${year} and developed by ${dev}, the title has been acclaimed for its technical prowess and gameplay on platforms such as ${platforms}. ${rating ? `With a rating of ${rating},` : ''} it stands as a key work that expands the horizons of its category. ${metacritic ? `Specialized critics have backed it with a ${metacritic}.` : ''}`;
+    }
+}
+
+/**
  * Transforms RAWG API game object to GameWiki internal format
  */
 function transformRAWGToGame(rawgGame) {
     if (!rawgGame) return null;
-    const manual = MANUAL_DESCRIPTIONS[rawgGame.id.toString()];
-    const rawDesc = rawgGame.description_raw;
-    const hasValidDesc = rawDesc && rawDesc !== "undefined" && rawDesc.length > 10;
+    const idStr = rawgGame.id.toString();
+    const manual = MANUAL_DESCRIPTIONS[idStr];
+    const rawDesc = rawgGame.description_raw || "";
+    const hasValidDesc = rawDesc && rawDesc !== "undefined" && rawDesc.length > 20;
 
-    const defaultDescEs = hasValidDesc ? (rawDesc.substring(0, 160) + "...") : "Descubre este increíble título en nuestra enciclopedia.";
-    const defaultDescEn = hasValidDesc ? (rawDesc.substring(0, 160) + "...") : "Discover this amazing title in our encyclopedia.";
+    // Detect language of the source description
+    const isEnglishSource = isEnglishText(rawDesc);
+
+    // Build descriptions
+    let finalDescEs = manual?.es || "";
+    let finalDescEn = manual?.en || "";
+
+    if (!finalDescEs) {
+        if (hasValidDesc && !isEnglishSource) {
+            finalDescEs = rawDesc;
+        } else {
+            // Generate professional Spanish intro + English source if it's the only one
+            const intro = generateLocalizedSummary(rawgGame, 'es');
+            finalDescEs = hasValidDesc
+                ? `${intro}\n\n---\n\n**[Nota: Descripción detallada disponible solo en inglés]**\n\n${rawDesc}`
+                : intro;
+        }
+    }
+
+    if (!finalDescEn) {
+        finalDescEn = hasValidDesc ? rawDesc : generateLocalizedSummary(rawgGame, 'en');
+    }
+
+    const developersArr = rawgGame.developers || [];
+    const developerNames = developersArr
+        .filter(d => d && d.name)
+        .map(d => d.name)
+        .join(', ');
 
     return {
         id: `rawg-${rawgGame.id}`,
         rawgId: rawgGame.id,
         title: rawgGame.name,
         description: {
-            es: manual?.es || defaultDescEs,
-            en: manual?.en || defaultDescEn
+            es: finalDescEs,
+            en: finalDescEn
         },
+        developer: developerNames || 'RAWG Data',
+        companyId: developersArr[0]?.slug || '',
         genre: rawgGame.genres?.map(g => g.name).join(', ') || '',
         releaseDate: rawgGame.released || 'N/A',
         image: rawgGame.background_image,
         rawg: {
             rating: rawgGame.rating,
-            metacritic: rawgGame.metacritic
+            metacritic: rawgGame.metacritic,
+            description_raw: rawDesc // Keep the raw one for reference
         }
     };
 }
@@ -858,24 +853,39 @@ function navigateToWiki(id, isFromPopState = false) {
         window.scrollTo(0, 0);
     }
 
-    const item = GAMES_DATA.find(g => g.id === id) ||
-        COMPANIES_DATA.find(c => c.id === id) ||
-        transformRAWGToGame(currentState.discoveryGames.find(g => `rawg-${g.id}` === id)) ||
-        transformRAWGToGame(currentState.dynamicDetails[id.replace('rawg-', '')]);
+    const isRawg = id.startsWith('rawg-');
+    const rawgId = isRawg ? id.replace('rawg-', '') : null;
+    const hasFullDetails = isRawg ? !!currentState.dynamicDetails[rawgId] : true;
 
-    if (!item && id.startsWith('rawg-')) {
-        // Fetch from RAWG if not in local or discovery cache (e.g. direct link or refresh)
+    if (isRawg && !hasFullDetails) {
+        // Fetch from RAWG if we don't have full details (even if it's in discovery cache)
         renderWikiLoading();
-        const rawgId = id.replace('rawg-', '');
         getGameDetails(rawgId).then(details => {
             if (details) {
-                // Store in dynamic cache so renderWiki can find it
                 currentState.dynamicDetails[rawgId] = details;
-                renderWiki();
+                // Re-verify the current ID hasn't changed while fetching
+                if (currentState.currentId === id) {
+                    renderWiki();
+                }
             } else {
+                console.warn(`Could not find details for RAWG ID: ${rawgId}`);
                 renderHome();
             }
+        }).catch(err => {
+            console.error("Navigation error:", err);
+            renderHome();
         });
+        return;
+    }
+
+    const item = GAMES_DATA.find(g => g.id === id) ||
+        COMPANIES_DATA.find(c => c.id === id) ||
+        (rawgId ? transformRAWGToGame(currentState.dynamicDetails[rawgId]) : null) ||
+        transformRAWGToGame(currentState.discoveryGames.find(g => `rawg-${g.id}` === id));
+
+    if (!item) {
+        console.warn(`Item not found for ID: ${id}. Returning home.`);
+        renderHome(null, false, false);
         return;
     }
 
@@ -883,11 +893,11 @@ function navigateToWiki(id, isFromPopState = false) {
     renderWiki();
 }
 
-function renderWiki() {
+function renderWiki(isSilentUpdate = false) {
     const id = currentState.currentId;
     const game = GAMES_DATA.find(g => g.id === id) ||
-        transformRAWGToGame(currentState.discoveryGames.find(g => `rawg-${g.id}` === id)) ||
-        transformRAWGToGame(currentState.dynamicDetails[id.replace('rawg-', '')]);
+        transformRAWGToGame(currentState.dynamicDetails[id.replace('rawg-', '')]) ||
+        transformRAWGToGame(currentState.discoveryGames.find(g => `rawg-${g.id}` === id));
     const item = game || COMPANIES_DATA.find(c => c.id === id);
 
     if (!item) {
@@ -895,6 +905,8 @@ function renderWiki() {
         renderHome();
         return;
     }
+
+    if (typeof trackWikiView === 'function') trackWikiView(item);
 
     el.hero.classList.add('hidden');
     el.gameGrid.classList.add('hidden');
@@ -912,29 +924,46 @@ function renderWiki() {
     // Reset mobile sidebar state
     el.wikiSidebar.classList.remove('mobile-active');
 
-    window.scrollTo(0, 0);
+    if (!isSilentUpdate) {
+        window.scrollTo(0, 0);
+    }
 
     const t = UI_TEXT[currentState.lang];
     const isGame = !!game;
 
-    // 1. Contents & Appearance Sidebar (Left)
+    const visibleSections = [
+        { id: 'intro', title: currentState.lang === 'es' ? 'Introducción' : 'Introduction', show: true },
+        { id: 'gallery', title: currentState.lang === 'es' ? 'Galería' : 'Gallery', show: true },
+        { id: 'achievements', title: currentState.lang === 'es' ? 'Logros' : 'Achievements', show: isGame },
+        { id: 'requirements', title: currentState.lang === 'es' ? 'Requerimientos' : 'Requirements', show: isGame },
+        { id: 'trailers', title: currentState.lang === 'es' ? 'Tráilers' : 'Trailers', show: isGame },
+        { id: 'dlcs', title: currentState.lang === 'es' ? 'Contenido Adicional' : 'Additional Content', show: isGame },
+        { id: 'history', title: currentState.lang === 'es' ? 'Historia' : 'History', show: true },
+        { id: 'dev', title: currentState.lang === 'es' ? 'Desarrollo' : 'Development', show: isGame },
+        { id: 'related', title: currentState.lang === 'es' ? 'Relacionados' : 'Related', show: isGame }
+    ].filter(s => isGame ? s.show : (s.id === 'intro' || s.id === 'history' || s.id === 'catalog'));
+
+    // 1. Contents Sidebar (Left)
     el.wikiSidebar.innerHTML = `
         <div class="sidebar-section">
             <div class="sidebar-title">
                 <h3>${t.contents}</h3>
-                <span class="hide-btn" onclick="this.parentElement.nextElementSibling.style.display = this.parentElement.nextElementSibling.style.display === 'none' ? 'block' : 'none'">${currentState.lang === 'es' ? 'ocultar' : 'hide'}</span>
+                <span class="hide-btn" onclick="toggleSidebarMenu(this)">${currentState.lang === 'es' ? 'ocultar' : 'hide'}</span>
             </div>
-            <ul>
-                <li><a href="#" class="active">(Top)</a></li>
-                <li><a href="#intro">${isGame ? t.about : 'Resumen'}</a></li>
-                <li><a href="#history">${currentState.lang === 'es' ? 'Historia' : 'History'}</a></li>
-                ${isGame ? `
-                    <li class="sub-item"><a href="#dev">${currentState.lang === 'es' ? 'Desarrollo' : 'Development'}</a></li>
-                    ${item.relatedGames ? `<li class="sub-item"><a href="#related">${currentState.lang === 'es' ? 'Relacionados' : 'Related'}</a></li>` : ''}
-                ` : `
-                    <li class="sub-item"><a href="#catalog">${currentState.lang === 'es' ? 'Catálogo' : 'Catalog'}</a></li>
-                `}
-            </ul>
+            <div class="sidebar-toc-container">
+                <ul class="toc-list">
+                    <li class="toc-item">
+                        <span class="toc-number">0.</span>
+                        <a href="#top" class="toc-link" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">(Top)</a>
+                    </li>
+                    ${visibleSections.map((s, i) => `
+                        <li class="toc-item">
+                            <span class="toc-number">${i + 1}.</span>
+                            <a href="#${s.id}" class="toc-link">${s.title}</a>
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
         </div>
 
         <div class="sidebar-section" style="margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
@@ -972,8 +1001,9 @@ function renderWiki() {
     // 2. Main Article Content
     const tocHtml = isGame ? generateTableOfContents(item) : '';
 
+    // 2. Main Article Content
     let articleHtml = `
-        <div class="wiki-article" style="font-size: ${currentState.textSize === 'small' ? '0.9rem' : currentState.textSize === 'large' ? '1.3rem' : '1.1rem'}; max-width: ${currentState.contentWidth === 'wide' ? '100%' : '900px'};">
+        <div class="wiki-header" style="font-size: ${currentState.textSize === 'small' ? '0.9rem' : currentState.textSize === 'large' ? '1.3rem' : '1.1rem'};">
             <!-- Breadcrumbs -->
             <nav class="breadcrumbs" style="font-size: 0.8rem; margin-bottom: 1.5rem; display: flex; gap: 0.5rem; color: var(--text-muted); align-items: center;">
                 <span class="breadcrumb-link" onclick="renderHome()" style="color: var(--primary); font-weight: 600;">${t.home}</span>
@@ -986,7 +1016,7 @@ function renderWiki() {
                 <span style="color: var(--text); font-weight: 600;">${isGame ? item.title : item.name}</span>
             </nav>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                 <div style="display: flex; gap: 0.75rem; align-items: center;">
                     <button class="back-btn" onclick="renderHome()" style="margin-bottom: 0;">
                         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
@@ -1005,184 +1035,211 @@ function renderWiki() {
                                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                             </svg>
                         </button>
+                        <button class="favorite-btn completion-btn ${isFavorite(item.id, 'completed') ? 'active' : ''}" 
+                                onclick="toggleFavorite('${item.id}', 'completed')" 
+                                title="${isFavorite(item.id, 'completed') ? UI_TEXT[currentState.lang].removeFromCompleted : UI_TEXT[currentState.lang].markAsCompleted}" 
+                                style="position: static; margin: 0; width: 40px; height: 40px;">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="${isFavorite(item.id, 'completed') ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                                <path d="M6 9V2h12v7M6 18c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2M6 9a3 3 0 0 0-3 3v2a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3v-2a3 3 0 0 0-3-3"/>
+                                <path d="M12 12v6M9 21h6"/>
+                            </svg>
+                        </button>
                         <button class="btn-check-deals" onclick="openDealsModal('${item.id}')" style="margin-top: 0; padding: 0.5rem 1rem; width: auto; font-size: 0.8rem;">
                             <span style="font-size: 1rem;">🏷️</span>
                             ${currentState.lang === 'es' ? 'Consultar Ofertas' : 'Check Deals'}
                         </button>
+                        <button class="share-btn" onclick="shareGame('${item.id}', '${isGame ? item.title : item.name.replace(/'/g, "\\'")}')" title="${currentState.lang === 'es' ? 'Compartir' : 'Share'}" style="margin: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 50%; cursor: pointer; color: var(--text); transition: all 0.3s;">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8m-4-6l-4-4-4 4m4-4v13"/></svg>
+                        </button>
                     ` : ''}
                 </div>
             </div>
-            <h1>${isGame ? item.title : item.name}</h1>
             
-            ${tocHtml}
+            <h1 style="font-family: 'Montserrat', sans-serif; font-size: 3.5rem; font-weight: 800; margin-bottom: 2rem; color: var(--text); line-height: 1.1;">${isGame ? item.title : item.name}</h1>
         </div>
-        
-        <p class="disambiguation" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 2rem; font-style: italic; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; display: flex; gap: 0.4rem; align-items: center;">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M11 9h2V7h-2v2zm1 11c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-18C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-6h-2v6z"/></svg>
-            ${isGame
-            ? (currentState.lang === 'es'
-                ? `Este artículo trata sobre el videojuego de ${item.releaseDate.split('-')[0]}.`
-                : `This article is about the ${item.releaseDate.split('-')[0]} video game.`)
-            : (currentState.lang === 'es'
-                ? `Este artículo trata sobre la empresa desarrolladora.`
-                : `This article is about the development company.`)}
-        </p>
 
-        <div class="infobox">
-            <div class="infobox-title">${isGame ? item.title : item.name}</div>
-            <img src="${isGame ? getGameImage(item) : (item.image || `https://api.dicebear.com/7.x/shapes/svg?seed=${item.id}`)}" 
-                 alt="${isGame ? item.title : item.name}"
-                 onerror="this.src='https://api.dicebear.com/7.x/shapes/svg?seed=${item.id}'">
-            <div class="infobox-caption">${isGame ? (currentState.lang === 'es' ? 'Arte de portada oficial' : 'Official cover art') : (currentState.lang === 'es' ? 'Logotipo oficial' : 'Official logo')}</div>
+        <div class="wiki-main-layout" style="font-size: ${currentState.textSize === 'small' ? '0.9rem' : currentState.textSize === 'large' ? '1.3rem' : '1.1rem'}; max-width: ${currentState.contentWidth === 'wide' ? '100%' : '1200px'};">
             
-            <div class="infobox-content">
-                ${isGame ? `
-                    <div class="infobox-row">
-                        <div class="infobox-label">Metacritic</div>
-                        <div class="infobox-value">
-                            ${(currentState.enrichedData[item.id] || item.rawg)?.metacritic
+            <aside class="wiki-infobox-aside">
+                <div class="infobox">
+                    <div class="infobox-title">${isGame ? item.title : item.name}</div>
+                    <img src="${isGame ? getGameImage(item) : (item.image || `https://api.dicebear.com/7.x/shapes/svg?seed=${item.id}`)}" 
+                         alt="${isGame ? item.title : item.name}"
+                         onerror="this.src='https://api.dicebear.com/7.x/shapes/svg?seed=${item.id}'">
+                    <div class="infobox-caption">${isGame ? (currentState.lang === 'es' ? 'Arte de portada oficial' : 'Official cover art') : (currentState.lang === 'es' ? 'Logotipo oficial' : 'Official logo')}</div>
+                    
+                    <div class="infobox-content">
+                        ${isGame ? `
+                            <div class="infobox-row">
+                                <div class="infobox-label">Metacritic</div>
+                                <div class="infobox-value">
+                                    ${(currentState.enrichedData[item.id] || item.rawg)?.metacritic
                 ? `<span class="meta-badge ${(currentState.enrichedData[item.id] || item.rawg).metacritic >= 75 ? 'meta-high' : 'meta-mid'}">${(currentState.enrichedData[item.id] || item.rawg).metacritic}</span>`
                 : 'N/A'
             }
-                        </div>
-                    </div>
-                    <div class="infobox-row">
-                        <div class="infobox-label">${t.developer}</div>
-                        <div class="infobox-value">${renderInternalLink(item.companyId)}</div>
-                    </div>
-                    <div class="infobox-row">
-                        <div class="infobox-label">${t.genre}</div>
-                        <div class="infobox-value">${item.genre.split(',').map(g => `<span class="genre-link" onclick="filterByGenre('${g.trim()}')">${g.trim()}</span>`).join(' ')}</div>
-                    </div>
-                    <div class="infobox-row">
-                        <div class="infobox-label">${t.release}</div>
-                        <div class="infobox-value">${item.releaseDate}</div>
-                    </div>
-                    ${(currentState.enrichedData[item.id] || item.rawg) ? `
-                        <div class="infobox-row">
-                            <div class="infobox-label">ESRB</div>
-                            <div class="infobox-value">${(currentState.enrichedData[item.id] || item.rawg).esrbRating || '—'}</div>
-                        </div>
-                        <div class="infobox-row">
-                            <div class="infobox-label">${currentState.lang === 'es' ? 'Promedio de Juego' : 'Playtime'}</div>
-                            <div class="infobox-value">${(currentState.enrichedData[item.id] || item.rawg).playtime || 0} ${currentState.lang === 'es' ? 'horas' : 'hours'}</div>
-                        </div>
-                        <div class="infobox-row">
-                            <div class="infobox-label">${currentState.lang === 'es' ? 'Votos RAWG' : 'RAWG Ratings'}</div>
-                            <div class="infobox-value">${(currentState.enrichedData[item.id] || item.rawg).ratingsCount || 0}</div>
-                        </div>
-                    ` : ''}
-                ` : `
-                    <div class="infobox-row">
-                        <div class="infobox-label">${currentState.lang === 'es' ? 'Fundación' : 'Founded'}</div>
-                        <div class="infobox-value">${item.founded || '—'}</div>
-                    </div>
-                    <div class="infobox-row">
-                        <div class="infobox-label">${currentState.lang === 'es' ? 'Sede' : 'Headquarters'}</div>
-                        <div class="infobox-value">${item.headquarters || '—'}</div>
-                    </div>
-                `}
-            </div >
-        </div >
-
-        <div class="wiki-content">
-            <section id="intro">
-                <p class="lead">${item.description[currentState.lang]}</p>
-            </section>
-            
-            ${isGame && (currentState.enrichedData[item.id] || item.rawg)?.screenshots ? `
-                <section id="gallery" style="margin-top: 2rem;">
-                    <h2 style="border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; margin-bottom: 1.5rem;">
-                        ${currentState.lang === 'es' ? 'Galería de Imágenes' : 'Image Gallery'}
-                    </h2>
-                    <div class="screenshot-grid">
-                        ${(currentState.enrichedData[item.id] || item.rawg).screenshots.map(s => `
-                            <div class="screenshot-item" onclick="openLightbox('${s.image}')">
-                                <img src="${s.thumbnail || s.image}" alt="Screenshot" loading="lazy">
+                                </div>
                             </div>
-                        `).join('')}
+                            <div class="infobox-row">
+                                <div class="infobox-label">${t.developer}</div>
+                                <div class="infobox-value">${renderInternalLink(item.companyId || item.developer)}</div>
+                            </div>
+                            <div class="infobox-row">
+                                <div class="infobox-label">${t.genre}</div>
+                                <div class="infobox-value">${item.genre.split(',').map(g => `<span class="genre-link" onclick="filterByGenre('${g.trim()}')">${g.trim()}</span>`).join(' ')}</div>
+                            </div>
+                            <div class="infobox-row">
+                                <div class="infobox-label">${t.release}</div>
+                                <div class="infobox-value">${item.releaseDate}</div>
+                            </div>
+                            ${(currentState.enrichedData[item.id] || item.rawg) ? `
+                                <div class="infobox-row">
+                                    <div class="infobox-label">ESRB</div>
+                                    <div class="infobox-value">${(currentState.enrichedData[item.id] || item.rawg).esrbRating || '—'}</div>
+                                </div>
+                                <div class="infobox-row">
+                                    <div class="infobox-label">${currentState.lang === 'es' ? 'Promedio de Juego' : 'Playtime'}</div>
+                                    <div class="infobox-value">${(currentState.enrichedData[item.id] || item.rawg).playtime || 0} ${currentState.lang === 'es' ? 'horas' : 'hours'}</div>
+                                </div>
+                                <div class="infobox-row">
+                                    <div class="infobox-label">${currentState.lang === 'es' ? 'Votos RAWG' : 'RAWG Ratings'}</div>
+                                    <div class="infobox-value">${(currentState.enrichedData[item.id] || item.rawg).ratingsCount || 0}</div>
+                                </div>
+                            ` : ''}
+                        ` : `
+                            <div class="infobox-row">
+                                <div class="infobox-label">${currentState.lang === 'es' ? 'Fundación' : 'Founded'}</div>
+                                <div class="infobox-value">${item.founded || '—'}</div>
+                            </div>
+                            <div class="infobox-row">
+                                <div class="infobox-label">${currentState.lang === 'es' ? 'Sede' : 'Headquarters'}</div>
+                                <div class="infobox-value">${item.headquarters || '—'}</div>
+                            </div>
+                        `}
                     </div>
-                </section>
-            ` : ''}
+                </div>
+            </aside>
 
-            ${isGame && renderSystemRequirements(currentState.enrichedData[item.id] || item.rawg)}
+            <div class="wiki-body">
+                <div class="disambiguation-box">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M11 9h2V7h-2v2zm1 11c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-18C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-6h-2v6z"/></svg>
+                    <span>${isGame
+            ? (currentState.lang === 'es' ? `Este artículo trata sobre el videojuego de ${item.releaseDate.split('-')[0]}.` : `This article is about the ${item.releaseDate.split('-')[0]} video game.`)
+            : (currentState.lang === 'es' ? `Este artículo trata sobre la empresa desarrolladora.` : `This article is about the development company.`)
+        }</span>
+                </div>
 
-            <div id="trailers-container">
-                <!-- Dynamically filled Trailers from RAWG -->
-            </div>
-        </div>
+                <div class="article-toc-box" style="margin-bottom: 2rem;">
+                    ${isGame ? generateTableOfContents(item) : ''}
+                </div>
 
-        <div id="history" style="margin-top: 2rem;">
-            <h2 style="border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; margin-bottom: 1rem;">
-                ${isGame ? (currentState.lang === 'es' ? 'Historia y Trasfondo' : 'History and Background') : (currentState.lang === 'es' ? 'Historia de la Empresa' : 'Company History')}
-            </h2>
-            <p>
-                ${isGame
+                <div class="wiki-content">
+                    <section id="intro">
+                        <p class="lead" style="font-size: 1.25em; line-height: 1.6; color: var(--text); opacity: 0.9; margin-bottom: 2rem;">${item.description[currentState.lang]}</p>
+                    </section>
+                    
+                    ${isGame && (currentState.enrichedData[item.id] || item.rawg)?.screenshots ? `
+                        <section id="gallery" style="margin-top: 2rem;">
+                            <h2 style="border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; margin-bottom: 1.5rem;">
+                                ${currentState.lang === 'es' ? 'Galería de Imágenes' : 'Image Gallery'}
+                            </h2>
+                            <div class="screenshot-grid">
+                                ${(currentState.enrichedData[item.id] || item.rawg).screenshots.map(s => `
+                                    <div class="screenshot-item" onclick="openLightbox('${s.image}')">
+                                        <img src="${s.thumbnail || s.image}" alt="Screenshot" loading="lazy">
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </section>
+                    ` : ''}
+
+                    <div id="achievements-container">
+                        <!-- Dynamically filled Achievements from RAWG -->
+                    </div>
+
+                    ${isGame ? renderSystemRequirements(currentState.enrichedData[item.id] || item.rawg) : ''}
+
+                    <div id="trailers-container">
+                        <!-- Dynamically filled Trailers from RAWG -->
+                    </div>
+
+                    <div id="dlcs-container">
+                        <!-- Dynamically filled DLCs from RAWG -->
+                    </div>
+
+                    <div id="history" style="margin-top: 3rem;">
+                        <h2 style="border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; margin-bottom: 1rem;">
+                            ${isGame ? (currentState.lang === 'es' ? 'Historia y Trasfondo' : 'History and Background') : (currentState.lang === 'es' ? 'Historia de la Empresa' : 'Company History')}
+                        </h2>
+                        <p>
+                            ${isGame
             ? (item.detailedHistory ? item.detailedHistory[currentState.lang] :
                 (MANUAL_DESCRIPTIONS[item.id.replace('rawg-', '')] ? MANUAL_DESCRIPTIONS[item.id.replace('rawg-', '')][currentState.lang] :
                     (currentState.lang === 'es'
-                        ? `Desde su lanzamiento en ${item.releaseDate}, ${item.title} ha sido un referente en el género de ${item.genre}. Desarrollado por ${renderInternalLink(item.companyId)}, el juego introdujo mecánicas innovadoras que cambiaron la industria.`
-                        : `Since its release in ${item.releaseDate}, ${item.title} has been a benchmark in the ${item.genre} genre. Developed by ${renderInternalLink(item.companyId)}, the game introduced innovative mechanics that changed the industry.`)))
+                        ? `${item.title} es una pieza fundamental del género ${item.genre}. Desde su lanzamiento el ${item.releaseDate}, ha cautivado a jugadores de todo el mundo ${item.developer ? `bajo el desarrollo de ${renderInternalLink(item.companyId || item.developer)}` : ''}, estableciendo nuevos estándares en la industria.`
+                        : `${item.title} is a fundamental piece of the ${item.genre} genre. Since its release on ${item.releaseDate}, it has captivated players worldwide ${item.developer ? `under the development of ${renderInternalLink(item.companyId || item.developer)}` : ''}, setting new standards in the industry.`)))
             : (currentState.lang === 'es'
                 ? `${item.name} ha moldeado la industria del videojuego a través de décadas de innovación y títulos legendarios.`
                 : `${item.name} has shaped the video game industry through decades of innovation and legendary titles.`)
         }
-            </p>
-        </div>
+                        </p>
+                    </div>
 
-    ${isGame ? `
-            <div id="dev" style="margin-top: 2rem;">
-                <h2 style="border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; margin-bottom: 1rem;">${currentState.lang === 'es' ? 'Desarrollo' : 'Development'}</h2>
-                <p>
-                    ${item.development ? item.development[currentState.lang] :
+                    ${isGame ? `
+                        <div id="dev" style="margin-top: 3rem;">
+                            <h2 style="border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; margin-bottom: 1rem;">${currentState.lang === 'es' ? 'Desarrollo' : 'Development'}</h2>
+                            <p>
+                                ${item.development ? item.development[currentState.lang] :
                 (currentState.lang === 'es'
-                    ? `El desarrollo de ${item.title} involucró un proceso creativo enfocado en la innovación dentro del género ${item.genre}.`
-                    : `The development of ${item.title} involved a creative process focused on innovation within the ${item.genre} genre.`)}
-                </p>
-            </div>
-            ${item.relatedGames ? `
-                <div id="related" style="margin-top: 3rem;">
-                    <h2 style="border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; margin-bottom: 1rem;">${currentState.lang === 'es' ? 'Juegos Relacionados' : 'Related Games'}</h2>
-                    <ul class="game-list-horizontal" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem; list-style: none; padding: 0;">
-                        ${item.relatedGames.map(relatedId => {
+                    ? `El proceso creativo detrás de ${item.title} se centró en expandir las fronteras de lo posible en el género ${item.genre}, buscando ofrecer una experiencia única y pulida para su audiencia.`
+                    : `The creative process behind ${item.title} focused on pushing the boundaries of what's possible in the ${item.genre} genre, seeking to deliver a unique and polished experience for its audience.`)}
+                            </p>
+                        </div>
+                        ${item.relatedGames ? `
+                            <div id="related" style="margin-top: 3rem;">
+                                <h2 style="border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; margin-bottom: 1rem;">${currentState.lang === 'es' ? 'Juegos Relacionados' : 'Related Games'}</h2>
+                                <ul class="game-list-horizontal" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem; list-style: none; padding: 0;">
+                                    ${item.relatedGames.map(relatedId => {
                         const relatedGame = GAMES_DATA.find(g => g.id === relatedId);
                         if (!relatedGame) return '';
                         return `
-                                <li>
-                                    <div class="mini-card" onclick="window.dispatchEvent(new CustomEvent('nav', {detail: '${relatedGame.id}'}))" style="cursor: pointer; transition: transform 0.2s;">
-                                        <img src="${getGameImage(relatedGame)}" alt="${relatedGame.title}" loading="lazy" style="width: 100%; height: 80px; object-fit: cover; border-radius: 4px; margin-bottom: 0.5rem;">
-                                        <div style="font-size: 0.8rem; font-weight: 600; line-height: 1.2;">${relatedGame.title}</div>
-                                    </div>
-                                </li>
-                            `;
+                                            <li>
+                                                <div class="mini-card" onclick="event.stopPropagation(); window.dispatchEvent(new CustomEvent('nav', {detail: '${relatedGame.id}'}))" style="cursor: pointer; transition: transform 0.2s;">
+                                                    <img src="${getGameImage(relatedGame)}" alt="${relatedGame.title}" loading="lazy" style="width: 100%; height: 80px; object-fit: cover; border-radius: 4px; margin-bottom: 0.5rem;">
+                                                    <div style="font-size: 0.8rem; font-weight: 600; line-height: 1.2;">${relatedGame.title}</div>
+                                                </div>
+                                            </li>
+                                        `;
                     }).join('')}
-                    </ul>
-                </div>
-            ` : ''}
+                                </ul>
+                            </div>
+                        ` : ''}
 
-            <div id="rawg-related" style="margin-top: 3rem;">
-                <!-- Dynamically filled Similar Games from RAWG -->
-            </div>
-        ` : `
-            <div id="catalog" style="margin-top: 3rem;">
-                <h2 style="border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; margin-bottom: 1rem;">${currentState.lang === 'es' ? 'Catálogo de Obras' : 'Catalog of Works'}</h2>
-                <ul class="game-list-horizontal" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem; list-style: none;">
-                    ${[
+                        <div id="rawg-related" style="margin-top: 3rem;">
+                            <!-- Dynamically filled Similar Games from RAWG -->
+                        </div>
+                    ` : `
+                        <div id="catalog" style="margin-top: 3rem;">
+                            <h2 style="border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; margin-bottom: 1rem;">${currentState.lang === 'es' ? 'Catálogo de Obras' : 'Catalog of Works'}</h2>
+                            <ul class="game-list-horizontal" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem; list-style: none;">
+                                ${[
             ...GAMES_DATA.filter(g => g.companyId === item.id),
             ...currentState.discoveryGames.filter(dg => dg.developers?.some(d => d.slug === item.id || d.name.toLowerCase() === item.name.toLowerCase())).map(transformRAWGToGame)
         ].map(g => `
-                        <li>
-                            <div class="mini-card" onclick="window.dispatchEvent(new CustomEvent('nav', {detail: '${g.id}'}))">
-                                <img src="${getGameImage(g)}" alt="${g.title}" loading="lazy" style="width: 100%; height: 80px; object-fit: cover; border-radius: 4px; margin-bottom: 0.5rem;">
-                                <span style="font-size: 0.8rem; font-weight: 600;">${g.title}</span>
-                            </div>
-                        </li>
-                    `).join('')}
-                    ${GAMES_DATA.filter(g => g.companyId === item.id).length === 0 && currentState.discoveryGames.filter(dg => dg.developers?.some(d => d.slug === item.id || d.name.toLowerCase() === item.name.toLowerCase())).length === 0 ? `<p style="color: var(--text-muted); font-size: 0.9rem;">${currentState.lang === 'es' ? 'No hay juegos vinculados en este momento.' : 'No games linked at this time.'}</p>` : ''}
-                </ul>
+                                    <li>
+                                        <div class="mini-card" onclick="event.stopPropagation(); window.dispatchEvent(new CustomEvent('nav', {detail: '${g.id}'}))">
+                                            <img src="${getGameImage(g)}" alt="${g.title}" loading="lazy" style="width: 100%; height: 80px; object-fit: cover; border-radius: 4px; margin-bottom: 0.5rem;">
+                                            <span style="font-size: 0.8rem; font-weight: 600;">${g.title}</span>
+                                        </div>
+                                    </li>
+                                `).join('')}
+                                ${GAMES_DATA.filter(g => g.companyId === item.id).length === 0 && currentState.discoveryGames.filter(dg => dg.developers?.some(d => d.slug === item.id || d.name.toLowerCase() === item.name.toLowerCase())).length === 0 ? `<p style="color: var(--text-muted); font-size: 0.9rem;">${currentState.lang === 'es' ? 'No hay juegos vinculados en este momento.' : 'No games linked at this time.'}</p>` : ''}
+                            </ul>
+                        </div>
+                    `}
+                </div>
             </div>
-        `}
-`;
+        </div>
+    `;
 
     el.wikiArticle.innerHTML = articleHtml;
 
@@ -1195,9 +1252,16 @@ function renderWiki() {
     if (isGame) {
         loadRAWGSimilarGames(item);
         loadRAWGTrailers(item);
+        loadRAWGAchievements(item);
+        loadRAWGDLCs(item);
 
-        // Automatic enrichment if not already done
-        if (!currentState.enrichedData[item.id]) {
+        // Automatic enrichment if not already done OR if requirements are missing
+        const enriched = currentState.enrichedData[item.id];
+        const needsEnrichment = !enriched ||
+            (isGame && (!enriched.platforms || enriched.platforms.length === 0) && !enriched.steamRequirements) ||
+            (item.rawgId && enriched.id && String(enriched.id) !== String(item.rawgId));
+
+        if (needsEnrichment) {
             console.log(`✨ Automáticamente enriqueciendo datos para: ${item.title} `);
             enrichSingleGame(item.id);
         }
@@ -1211,38 +1275,72 @@ function generateTableOfContents(item) {
     const sections = [
         { id: 'intro', title: currentState.lang === 'es' ? 'Introducción' : 'Introduction', show: true },
         { id: 'gallery', title: currentState.lang === 'es' ? 'Galería' : 'Gallery', show: !!enriched?.screenshots },
-        { id: 'requirements', title: currentState.lang === 'es' ? 'Requerimientos' : 'Requirements', show: !!enriched?.platforms },
-        { id: 'trailers', title: currentState.lang === 'es' ? 'Tráilers' : 'Trailers', show: true }, // We check trailers async, but usually games have them
+        { id: 'achievements', title: currentState.lang === 'es' ? 'Logros' : 'Achievements', show: true },
+        { id: 'requirements', title: currentState.lang === 'es' ? 'Requerimientos' : 'Requirements', show: !!enriched?.platforms || !!enriched?.steamRequirements },
+        { id: 'trailers', title: currentState.lang === 'es' ? 'Tráilers' : 'Trailers', show: true },
+        { id: 'dlcs', title: currentState.lang === 'es' ? 'Contenido Adicional' : 'Additional Content', show: true },
         { id: 'history', title: currentState.lang === 'es' ? 'Historia' : 'History', show: true },
         { id: 'dev', title: currentState.lang === 'es' ? 'Desarrollo' : 'Development', show: !!item.development || isGame },
         { id: 'related', title: currentState.lang === 'es' ? 'Relacionados' : 'Related', show: !!item.relatedGames || isGame }
     ];
 
+    // Ensure IDs exist in the DOM or fallback
     const visibleSections = sections.filter(s => s.show);
 
     return `
         <div class="toc-container">
             <div class="toc-title">
-                ${currentState.lang === 'es' ? 'Contenido' : 'Contents'}
+                ${currentState.lang === 'es' ? 'Mapa de Contenidos' : 'Article Contents'}
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
             </div>
             <ul class="toc-list">
-                ${visibleSections.map(s => `
+                ${visibleSections.map((s, i) => `
                     <li class="toc-item">
+                        <span class="toc-number">${i + 1}.</span>
                         <a href="#${s.id}" class="toc-link">${s.title}</a>
                     </li>
                 `).join('')}
             </ul>
-        </div >
+        </div>
     `;
 }
+
+window.scrollToSection = function (e, id) {
+    e.preventDefault();
+    const element = document.getElementById(id);
+    if (element) {
+        const offset = 100; // Account for fixed header
+        const bodyRect = document.body.getBoundingClientRect().top;
+        const elementRect = element.getBoundingClientRect().top;
+        const elementPosition = elementRect - bodyRect;
+        const offsetPosition = elementPosition - offset;
+
+        window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+        });
+    }
+};
+
+window.toggleSidebarMenu = function (btn) {
+    const target = btn.parentElement.nextElementSibling;
+    if (!target) return;
+
+    if (target.style.display === 'none') {
+        target.style.display = 'block';
+        btn.innerText = currentState.lang === 'es' ? 'ocultar' : 'hide';
+    } else {
+        target.style.display = 'none';
+        btn.innerText = currentState.lang === 'es' ? 'mostrar' : 'show';
+    }
+};
 
 async function loadRAWGTrailers(item) {
     const rawgData = currentState.enrichedData[item.id] || item.rawg;
 
     // Helper to hide TOC section
     const hideTOCSection = () => {
-        const tocLink = document.querySelector(`.toc - link[href = "#trailers"]`);
+        const tocLink = document.querySelector('.toc-link[href="#trailers"]');
         if (tocLink) {
             tocLink.closest('.toc-item')?.remove();
         }
@@ -1274,13 +1372,13 @@ async function loadRAWGTrailers(item) {
         }
 
         container.innerHTML = `
-    < section id = "trailers" style = "margin-top: 3rem;" >
+            <section id="trailers" style="margin-top: 3rem;">
                 <h2 style="border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; margin-bottom: 1.5rem;">
                     ${currentState.lang === 'es' ? 'Tráilers y Videos' : 'Trailers & Videos'}
                 </h2>
                 <div class="trailers-grid">
                     ${trailers.map(t => `
-                        <div class="trailer-card" onclick="window.open('${t.data.max}', '_blank')">
+                        <div class="trailer-card" onclick="showTrailerVideo('${t.data.max}')">
                             <div class="trailer-thumb-container">
                                 <img src="${t.preview}" class="trailer-thumb" alt="${t.name}">
                                 <div class="play-button-overlay">
@@ -1293,7 +1391,7 @@ async function loadRAWGTrailers(item) {
                         </div>
                     `).join('')}
                 </div>
-            </section >
+            </section>
     `;
     } catch (e) {
         console.error('Failed to load trailers:', e);
@@ -1301,10 +1399,117 @@ async function loadRAWGTrailers(item) {
     }
 }
 
+async function loadRAWGAchievements(item) {
+    const rawgData = currentState.enrichedData[item.id] || item.rawg;
+    if (!rawgData || !rawgData.id) return;
+
+    const container = document.getElementById('achievements-container');
+    if (!container) return;
+
+    try {
+        const achievements = await getGameAchievements(rawgData.id);
+        if (!achievements || achievements.length === 0) {
+            document.querySelector('.toc-link[href="#achievements"]')?.closest('.toc-item')?.remove();
+            return;
+        }
+
+        container.innerHTML = `
+            <section id="achievements" style="margin-top: 3rem;">
+                <h2 style="border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; margin-bottom: 1.5rem;">
+                    ${currentState.lang === 'es' ? 'Logros y Trofeos' : 'Achievements & Trophies'}
+                </h2>
+                <div class="achievements-grid">
+                    ${achievements.map(a => `
+                        <div class="achievement-card">
+                            <img src="${a.image || 'https://api.dicebear.com/7.x/shapes/svg?seed=' + a.id}" class="achievement-image" alt="${a.name}">
+                            <div class="achievement-info">
+                                <span class="achievement-name">${a.name}</span>
+                                <span class="achievement-description">${a.description || ''}</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </section>
+        `;
+    } catch (e) {
+        console.error('Failed to load achievements:', e);
+    }
+}
+
+async function loadRAWGDLCs(item) {
+    const rawgData = currentState.enrichedData[item.id] || item.rawg;
+    if (!rawgData || !rawgData.id) return;
+
+    const container = document.getElementById('dlcs-container');
+    if (!container) return;
+
+    try {
+        const dlcs = await getGameDLC(rawgData.id);
+        if (!dlcs || dlcs.length === 0) {
+            document.querySelector('.toc-link[href="#dlcs"]')?.closest('.toc-item')?.remove();
+            return;
+        }
+
+        container.innerHTML = `
+            <section id="dlcs" style="margin-top: 3rem;">
+                <h2 style="border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; margin-bottom: 1.5rem;">
+                    ${currentState.lang === 'es' ? 'Expansiones y DLC' : 'DLC & Expansions'}
+                </h2>
+                <div class="dlc-grid">
+                    ${dlcs.map(d => `
+                        <div class="dlc-card" onclick="navigateToWiki('rawg-${d.id}')">
+                            <img src="${d.background_image || 'https://api.dicebear.com/7.x/shapes/svg?seed=' + d.id}" class="dlc-image" alt="${d.name}">
+                            <div class="dlc-info">
+                                <span class="dlc-name">${d.name}</span>
+                                <span class="dlc-meta">${d.released ? d.released.split('-')[0] : ''}</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </section>
+        `;
+    } catch (e) {
+        console.error('Failed to load DLCs:', e);
+    }
+}
+
+function showTrailerVideo(videoUrl) {
+    const modal = document.getElementById('video-modal');
+    const container = document.getElementById('video-player-container');
+    if (!modal || !container) return;
+
+    // We can use a simple video tag if it's a direct file or an iframe if we can embed it
+    // Most RAWG video URLs are direct .mp4 files (from rawgRequest movies)
+    container.innerHTML = `
+        <video controls autoplay class="premium-video" style="width: 100%; height: 100%; border-radius: 8px;">
+            <source src="${videoUrl}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    `;
+
+    modal.classList.remove('hidden');
+    // Force reflow
+    void modal.offsetWidth;
+    modal.classList.add('visible');
+}
+
 function setupWikiListeners() {
-    // Scroll handling for active sidebar link
     const sections = document.querySelectorAll('.wiki-article div[id], .wiki-article section[id]');
     const navLinks = document.querySelectorAll('.wiki-sidebar a');
+
+    // Attach smooth scroll to ALL internal links in wiki
+    const allLinks = document.querySelectorAll('.wiki-container a[href^="#"]');
+    allLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            const id = link.getAttribute('href').substring(1);
+            if (id) {
+                scrollToSection(e, id);
+            } else {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+    });
 
     window.onscroll = () => {
         let current = "";
@@ -1317,7 +1522,7 @@ function setupWikiListeners() {
 
         navLinks.forEach(link => {
             link.classList.remove("active");
-            if (link.getAttribute("href") === `#${current} `) {
+            if (link.getAttribute("href") === `#${current}`) {
                 link.classList.add("active");
             }
         });
@@ -1441,6 +1646,24 @@ async function fetchSteamPrice(appId) {
     return null;
 }
 
+async function fetchSteamRequirements(appId) {
+    if (!appId) return null;
+    const targetUrl = `https://store.steampowered.com/api/appdetails?appids=${appId}&filters=pc_requirements`;
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+
+    try {
+        const res = await fetch(proxyUrl);
+        const data = await res.json();
+        if (data && data[appId] && data[appId].success && data[appId].data.pc_requirements) {
+            return data[appId].data.pc_requirements;
+        }
+    } catch (e) {
+        console.warn('Steam Requirements fetch failed:', e);
+    }
+    return null;
+}
+
+
 async function renderStores_DEPRECATED(game, lang) {
     const container = document.getElementById('store-container');
     if (!container) return;
@@ -1538,14 +1761,26 @@ async function renderStores_DEPRECATED(game, lang) {
 }
 
 function renderInternalLink(companyId) {
-    const comp = COMPANIES_DATA.find(c => c.id === companyId);
-    if (!comp) return companyId;
-    return `<span class="internal-link" onclick="window.dispatchEvent(new CustomEvent('nav', {detail: '${companyId}'}))">${comp.name}</span>`;
+    if (!companyId || companyId === 'undefined' || companyId === 'null') return 'N/A';
+
+    // Check if it's an ID or name in our COMPANIES_DATA
+    const comp = COMPANIES_DATA.find(c =>
+        c.id === companyId ||
+        c.name.toLowerCase() === companyId.toLowerCase()
+    );
+
+    if (comp) {
+        return `<span class="internal-link" onclick="window.dispatchEvent(new CustomEvent('nav', {detail: '${comp.id}'}))">${comp.name}</span>`;
+    }
+
+    // If not in our database, just return the name itself as text
+    return companyId;
 }
 
 function renderSystemRequirements(enriched) {
+    const hasSteam = enriched && enriched.steamRequirements;
+
     // Check if we have data AND if it's the NEW format (with requirements objects)
-    // Old format was just an array of strings: ['PC', 'PS5']
     const hasDetailedPlatforms = enriched && enriched.platforms &&
         enriched.platforms.length > 0 &&
         typeof enriched.platforms[0] === 'object';
@@ -1554,11 +1789,12 @@ function renderSystemRequirements(enriched) {
         ? enriched.platforms.filter(p => p.requirements && (p.requirements.minimum || p.requirements.recommended))
         : [];
 
-    if (!enriched || !hasDetailedPlatforms || (hasDetailedPlatforms && requirements.length === 0)) {
+    if (!hasSteam && (!enriched || !hasDetailedPlatforms || (hasDetailedPlatforms && requirements.length === 0))) {
+
         // If no data, or old data format, or new format but no requirements found in RAWG
         // We show the "Fetch" box unless we are SURE RAWG has nothing (which we can't be without trying)
         return `
-            <div class="fetch-req-box" style="margin-top: 2rem; padding: 2rem; background: var(--wiki-bg); border-radius: 12px; border: 2px dashed var(--primary); text-align: center; box-shadow: var(--shadow);">
+            <div class="fetch-req-box">
                 <div style="font-size: 2rem; margin-bottom: 1rem;">🔧</div>
                 <h3 style="margin-bottom: 0.5rem; color: var(--text);">
                     ${currentState.lang === 'es' ? '¿Faltan los Requerimientos?' : 'Missing Requirements?'}
@@ -1576,32 +1812,69 @@ function renderSystemRequirements(enriched) {
         `;
     }
 
+    const steam = enriched?.steamRequirements;
+
+    // Build combined list of requirement sources
+    const allReqs = [];
+    if (steam) {
+        allReqs.push({
+            id: 'steam-pc',
+            name: 'PC (Steam)',
+            minimum: steam.minimum,
+            recommended: steam.recommended,
+            isHtml: true
+        });
+    }
+
+    requirements.forEach(r => {
+        // Skip adding RAWG PC if we already have Steam PC
+        const isPc = r.name.toLowerCase().includes('pc') || r.name.toLowerCase().includes('windows');
+        if (steam && isPc) return;
+
+        allReqs.push({
+            id: r.name.replace(/\s+/g, '-'),
+            name: r.name,
+            minimum: r.requirements.minimum?.replace('Minimum:', '').trim(),
+            recommended: r.requirements.recommended?.replace('Recommended:', '').trim(),
+            isHtml: false
+        });
+    });
+
+    if (allReqs.length === 0) return ''; // Should not happen due to if above
+
     return `
         <section id="requirements" style="margin-top: 3rem;">
-            <h2 style="border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; margin-bottom: 1.5rem;">
-                ${currentState.lang === 'es' ? 'Requerimientos del Sistema' : 'System Requirements'}
-            </h2>
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; margin-bottom: 1.5rem;">
+                <h2 style="margin: 0; border: none;">
+                    ${currentState.lang === 'es' ? 'Requerimientos del Sistema' : 'System Requirements'}
+                </h2>
+                ${steam ? '<span style="font-size: 0.7rem; color: var(--text-muted); padding: 2px 8px; border: 1px solid var(--border); border-radius: 4px; opacity: 0.8;">via Steam</span>' : ''}
+            </div>
             <div class="req-container">
                 <div class="req-tabs">
-                    ${requirements.map((r, i) => `
-                        <button class="req-tab-btn ${i === 0 ? 'active' : ''}" onclick="switchReqTab(this, '${r.name.replace(/\s+/g, '-')}')">
+                    ${allReqs.map((r, i) => `
+                        <button class="req-tab-btn ${i === 0 ? 'active' : ''}" onclick="switchReqTab(this, '${r.id}')">
                             ${r.name}
                         </button>
                     `).join('')}
                 </div>
                 <div class="req-content">
-                    ${requirements.map((r, i) => `
-                        <div id="req-${r.name.replace(/\s+/g, '-')}" class="req-panel ${i === 0 ? '' : 'hidden'}">
-                            ${r.requirements.minimum ? `
+                    ${allReqs.map((r, i) => `
+                        <div id="req-${r.id}" class="req-panel ${i === 0 ? '' : 'hidden'}">
+                            ${r.minimum ? `
                                 <div class="req-section">
                                     <div class="req-label">${currentState.lang === 'es' ? 'Mínimo' : 'Minimum'}</div>
-                                    <div class="req-text" style="background: var(--bg); padding: 1.25rem; border-radius: 8px; border-left: 4px solid #94a3b8; font-family: monospace; white-space: pre-wrap;">${r.requirements.minimum.replace('Minimum:', '').trim()}</div>
+                                    <div class="req-text" style="background: var(--bg); padding: 1.25rem; border-radius: 8px; border-left: 4px solid #94a3b8; font-family: ${r.isHtml ? 'inherit' : 'monospace'}; white-space: ${r.isHtml ? 'normal' : 'pre-wrap'}; font-size: 0.9rem; line-height: 1.5;">
+                                        ${r.isHtml ? r.minimum : r.minimum}
+                                    </div>
                                 </div>
                             ` : ''}
-                            ${r.requirements.recommended ? `
+                            ${r.recommended ? `
                                 <div class="req-section" style="margin-top: 2rem;">
                                     <div class="req-label">${currentState.lang === 'es' ? 'Recomendado' : 'Recommended'}</div>
-                                    <div class="req-text" style="background: var(--bg); padding: 1.25rem; border-radius: 8px; border-left: 4px solid var(--primary); font-family: monospace; white-space: pre-wrap;">${r.requirements.recommended.replace('Recommended:', '').trim()}</div>
+                                    <div class="req-text" style="background: var(--bg); padding: 1.25rem; border-radius: 8px; border-left: 4px solid var(--primary); font-family: ${r.isHtml ? 'inherit' : 'monospace'}; white-space: ${r.isHtml ? 'normal' : 'pre-wrap'}; font-size: 0.9rem; line-height: 1.5;">
+                                        ${r.isHtml ? r.recommended : r.recommended}
+                                    </div>
                                 </div>
                             ` : ''}
                         </div>
@@ -1611,6 +1884,7 @@ function renderSystemRequirements(enriched) {
         </section>
     `;
 }
+
 
 window.switchReqTab = function (btn, platformId) {
     const container = btn.closest('.req-container');
@@ -1649,7 +1923,7 @@ async function loadRAWGSimilarGames(item) {
             </h2>
             <div class="similar-games-grid">
                 ${series.slice(0, 6).map(g => `
-                    <div class="similar-game-card" onclick="navigateToSimilarGame('${g.slug}', '${g.name}')">
+                    <div class="similar-game-card" onclick="navigateToSimilarGame('${g.id}', '${g.name}', '${g.slug}')">
                         <img src="${g.background_image || 'https://api.dicebear.com/7.x/shapes/svg?seed=' + g.id}" alt="${g.name}" loading="lazy">
                         <div class="similar-game-info">
                             <span class="similar-game-title">${g.name}</span>
@@ -1666,35 +1940,25 @@ async function loadRAWGSimilarGames(item) {
     }
 }
 
-window.navigateToSimilarGame = function (slug, name) {
-    // 1. Try to find in our local database
-    // We check by slug or title match
-    const match = GAMES_DATA.find(g => g.id === slug || g.title.toLowerCase() === name.toLowerCase()) ||
-        transformRAWGToGame(currentState.discoveryGames.find(g => g.slug === slug || g.name.toLowerCase() === name.toLowerCase())) ||
-        transformRAWGToGame(Object.values(currentState.dynamicDetails).find(g => g.slug === slug || g.name.toLowerCase() === name.toLowerCase()));
+window.navigateToSimilarGame = function (gameId, name, slug) {
+    // 1. Try to find in our local database first to keep using internal IDs if possible
+    const match = GAMES_DATA.find(g =>
+        g.rawgId == gameId ||
+        g.id === slug ||
+        g.title.toLowerCase() === name.toLowerCase()
+    );
 
     if (match) {
         navigateToWiki(match.id);
-        window.scrollTo(0, 0);
     } else {
-        // 2. If not found, search it in our search bar for the user
-        el.search.value = name;
-        handleSearch(name);
-        el.search.focus();
-
-        // Notify user
-        const msg = currentState.lang === 'es'
-            ? `"${name}" no está en la Wiki todavía. ¡Búscalo entre nuestros resultados!`
-            : `"${name}" is not in the Wiki yet. Search it in our results!`;
-        console.log(msg);
+        // 2. Not in local? No problem! Use the numeric ID with the rawg- prefix.
+        // navigateToWiki will fetch all details and create the page dynamically.
+        navigateToWiki(`rawg-${gameId}`);
     }
+    window.scrollTo(0, 0);
 };
 
-function renderInternalLink(companyId) {
-    const comp = COMPANIES_DATA.find(c => c.id === companyId);
-    if (!comp) return companyId;
-    return `<span class="internal-link" onclick="window.dispatchEvent(new CustomEvent('nav', {detail: '${companyId}'}))">${comp.name}</span>`;
-}
+// Redundant renderInternalLink removed
 
 // --- Mobile Sidebar Toggle ---
 function renderWikiLoading() {
@@ -1703,30 +1967,27 @@ function renderWikiLoading() {
     el.gameGrid.classList.add('hidden');
     el.genreFilter.classList.add('hidden');
     el.wikiArticle.innerHTML = `
-        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5rem 2rem;">
-            <div class="loading-spinner" style="width: 50px; height: 50px; margin-bottom: 2rem;"></div>
-            <p style="font-size: 1.2rem; font-weight: 600;">${currentState.lang === 'es' ? 'Cargando datos desde RAWG...' : 'Fetching data from RAWG...'}</p>
+        <div class="wiki-skeleton" style="padding: 2rem; max-width: 900px; margin: 0 auto;">
+            <div class="skeleton-title skeleton"></div>
+            <div style="display: flex; gap: 2rem; margin-bottom: 3rem;">
+                <div style="flex: 2;">
+                    <div class="skeleton-image skeleton" style="height: 300px;"></div>
+                    <div class="skeleton-text skeleton"></div>
+                    <div class="skeleton-text skeleton"></div>
+                    <div class="skeleton-text skeleton" style="width: 80%;"></div>
+                </div>
+                <div style="flex: 1;">
+                    <div class="skeleton skeleton-image" style="height: 400px;"></div>
+                </div>
+            </div>
+            <div class="skeleton-title skeleton" style="width: 40%;"></div>
+            <div class="skeleton-text skeleton"></div>
+            <div class="skeleton-text skeleton"></div>
         </div>
     `;
 }
 
-function generateTableOfContents(item) {
-    if (!item || !item.id) return '';
-    return `
-        <div class="toc" id="toc">
-            <div class="toc-title">
-                <strong>${currentState.lang === 'es' ? 'Tabla de contenidos' : 'Contents'}</strong>
-                <span class="toc-toggle" onclick="document.getElementById('toc-list').classList.toggle('hidden')">${currentState.lang === 'es' ? '[ocultar]' : '[hide]'}</span>
-            </div>
-            <ul id="toc-list">
-                <li><a href="#intro">1 ${currentState.lang === 'es' ? 'Resumen' : 'Overview'}</a></li>
-                <li><a href="#history">2 ${currentState.lang === 'es' ? 'Historia' : 'History'}</a></li>
-                <li><a href="#dev">3 ${currentState.lang === 'es' ? 'Desarrollo' : 'Development'}</a></li>
-                ${item.relatedGames ? `<li><a href="#related">4 ${currentState.lang === 'es' ? 'Juegos Relacionados' : 'Related Games'}</a></li>` : ''}
-            </ul>
-        </div>
-    `;
-}
+// Redundant duplicate removed
 
 window.toggleWikiSidebar = function () {
     const sidebar = el.wikiSidebar;
@@ -1770,6 +2031,7 @@ function setupEventListeners() {
         currentState.lang = currentState.lang === 'es' ? 'en' : 'es';
         localStorage.setItem('gamewiki-lang', currentState.lang);
         updateUILabels();
+        if (typeof trackLangSwap === 'function') trackLangSwap();
 
         if (currentState.view === 'home') {
             // For home, we update the state so renderHome picks it up
@@ -1802,46 +2064,74 @@ function setupEventListeners() {
         };
     }
 
-    el.search.oninput = (e) => {
-        const query = e.target.value.toLowerCase();
-        if (!query) {
-            el.searchResults.classList.add('hidden');
-            return;
-        }
-
-        const filteredGames = [
-            ...GAMES_DATA.filter(g => g.title.toLowerCase().includes(query)),
-            ...currentState.discoveryGames.filter(g => g.name.toLowerCase().includes(query)).map(transformRAWGToGame)
-        ].filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i); // Unique
-
-        const filteredCompanies = COMPANIES_DATA.filter(c => c.name.toLowerCase().includes(query));
-
-        if (filteredGames.length || filteredCompanies.length) {
-            el.searchResults.classList.remove('hidden');
-            el.searchResults.innerHTML = [
-                ...filteredGames.map(g => `
-                    <div class="search-item" onclick="window.dispatchEvent(new CustomEvent('nav', {detail: '${g.id}'}))">
-                        <img src="${getGameImage(g)}" style="width: 30px; height: 17px; object-fit: cover; border-radius: 2px; margin-right: 10px;">
-                        <span>${g.title}</span>
-                    </div>
-                `),
-                ...filteredCompanies.map(c => `
-                    <div class="search-item" onclick="window.dispatchEvent(new CustomEvent('nav', {detail: '${c.id}'}))">
-                        <img src="https://api.dicebear.com/7.x/shapes/svg?seed=${c.id}" style="width: 20px; vertical-align: middle; margin-right: 10px;">
-                        <span>${c.name}</span>
-                    </div>
-                `)
-            ].join('');
-        } else {
-            el.searchResults.classList.add('hidden');
+    // Search input focus behavior for history
+    el.search.onfocus = () => {
+        if (!el.search.value.trim() && currentState.searchHistory.length > 0) {
+            handleSearch('');
         }
     };
 
-    // Keyboard shortcut for search
+    // Clear search button
+    const clearSearchBtn = document.getElementById('clear-search-btn');
+    if (clearSearchBtn) {
+        clearSearchBtn.onclick = () => {
+            el.search.value = '';
+            clearSearchBtn.style.display = 'none';
+            handleSearch('');
+            el.search.focus();
+        };
+    }
+
+    // Keyboard Shortcuts Button
+    if (el.kbdShortcutsBtn) {
+        el.kbdShortcutsBtn.onclick = () => {
+            if (el.kbdModal) {
+                el.kbdModal.classList.remove('hidden');
+                void el.kbdModal.offsetWidth;
+                el.kbdModal.classList.add('visible');
+            }
+        };
+    }
+
+    // Achievements Button
+    if (el.achievementsBtn) {
+        el.achievementsBtn.onclick = () => {
+            if (el.achievementsModal) {
+                renderAchievementsModal();
+                el.achievementsModal.classList.remove('hidden');
+                void el.achievementsModal.offsetWidth;
+                el.achievementsModal.classList.add('visible');
+            }
+        };
+    }
+
+    // Global Keyboard Shortcuts
     document.addEventListener('keydown', (e) => {
+        // Search: '/'
         if (e.key === '/' && document.activeElement !== el.search) {
             e.preventDefault();
             el.search.focus();
+        }
+
+        // Home: Alt + H
+        if (e.altKey && e.key.toLowerCase() === 'h') {
+            e.preventDefault();
+            renderHome();
+        }
+
+        // Favorites: Alt + F
+        if (e.altKey && e.key.toLowerCase() === 'f') {
+            e.preventDefault();
+            renderFavorites();
+        }
+
+        // Close Modals: Escape
+        if (e.key === 'Escape') {
+            const visibleModal = document.querySelector('.modal:not(.hidden)');
+            if (visibleModal) {
+                const closeBtn = visibleModal.querySelector('.close-modal');
+                if (closeBtn) closeBtn.click();
+            }
         }
     });
 
@@ -1854,6 +2144,9 @@ function setupEventListeners() {
 
     // Global navigation event to handle dynamic internal links
     window.addEventListener('nav', (e) => {
+        if (el.search.value.trim()) {
+            addToSearchHistory(el.search.value.trim());
+        }
         navigateToWiki(e.detail);
         el.searchResults.classList.add('hidden');
         el.search.value = '';
@@ -1904,7 +2197,11 @@ function initializeSearchFilters() {
 
     // 1. Populate Genre Select
     const genres = new Set();
-    GAMES_DATA.forEach(g => g.genre.split(',').forEach(s => genres.add(s.trim())));
+    GAMES_DATA.forEach(g => {
+        if (g.genre) {
+            g.genre.split(',').forEach(s => genres.add(s.trim()));
+        }
+    });
 
     if (genres.size === 0) {
         ['Action', 'Adventure', 'RPG', 'Shooter', 'Indie', 'Strategy', 'Puzzle', 'Platformer', 'Sports', 'Racing', 'Fighting'].forEach(g => genres.add(g));
@@ -1920,8 +2217,10 @@ function initializeSearchFilters() {
     // 2. Populate Year Select
     const years = new Set();
     GAMES_DATA.forEach(g => {
-        const year = g.releaseDate.split('-')[0];
-        if (year) years.add(year);
+        if (g.releaseDate) {
+            const year = g.releaseDate.split('-')[0];
+            if (year) years.add(year);
+        }
     });
 
     if (years.size === 0) {
@@ -1948,6 +2247,8 @@ function initializeSearchFilters() {
     filterToggle.onclick = () => {
         filterPanel.classList.toggle('hidden');
         filterToggle.classList.toggle('active');
+        const wrapper = document.querySelector('.search-wrapper');
+        if (wrapper) wrapper.classList.toggle('filters-active');
     };
 
     const runSearch = () => {
@@ -1998,13 +2299,41 @@ function initializeSearchFilters() {
     };
 }
 
+function renderSearchHistory() {
+    if (currentState.searchHistory.length === 0) return '';
+    return `
+        <div class="search-section-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>${currentState.lang === 'es' ? 'Búsquedas Recientes' : 'Recent Searches'}</span>
+            <span class="clear-all-link" onclick="clearSearchHistory(); el.searchResults.innerHTML = renderSearchHistory();" style="font-size: 0.65rem; cursor: pointer; opacity: 0.6; text-transform: none; letter-spacing: 0;">${currentState.lang === 'es' ? 'Limpiar todo' : 'Clear all'}</span>
+        </div>
+        ${currentState.searchHistory.map(q => `
+            <div class="history-item" onclick="el.search.value='${q}'; handleSearch('${q}')" style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; flex: 1;">
+                    <svg class="history-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span>${q}</span>
+                </div>
+                <button class="remove-history-btn" onclick="event.stopPropagation(); removeFromSearchHistory('${q}'); el.searchResults.innerHTML = renderSearchHistory();" title="Quitar">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+        `).join('')}
+    `;
+}
+
 function handleSearch(query) {
     const q = query.toLowerCase().trim();
     const filters = currentState.searchFilters;
+    const clearBtn = document.getElementById('clear-search-btn');
+    if (clearBtn) clearBtn.style.display = q ? 'block' : 'none';
 
-    // If no query and no filters, hide
+    // If no query and no filters, show history if available
     if (!q && !filters.genre && !filters.year && !filters.developer) {
-        el.searchResults.classList.add('hidden');
+        if (currentState.searchHistory.length > 0) {
+            el.searchResults.innerHTML = renderSearchHistory();
+            el.searchResults.classList.remove('hidden');
+        } else {
+            el.searchResults.classList.add('hidden');
+        }
         return;
     }
 
@@ -2012,13 +2341,17 @@ function handleSearch(query) {
         ...GAMES_DATA,
         ...currentState.discoveryGames.map(transformRAWGToGame),
         ...Object.values(currentState.dynamicDetails).map(transformRAWGToGame)
-    ].filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i);
+    ].filter((v, i, a) => a.findIndex(t => (t && t.id === v.id)) === i);
 
     let filteredGames = gamesToSearch.filter(g => {
+        if (!g) return false;
         const matchesQuery = !q || g.title.toLowerCase().includes(q);
         const matchesGenre = !filters.genre || g.genre.includes(filters.genre);
         const matchesYear = !filters.year || g.releaseDate.startsWith(filters.year);
-        const matchesDev = !filters.developer || g.companyId === filters.developer;
+        const matchesDev = !filters.developer || (
+            (g.companyId && g.companyId === filters.developer) ||
+            (g.developer && g.developer.toLowerCase().includes(filters.developer.toLowerCase()))
+        );
         return matchesQuery && matchesGenre && matchesYear && matchesDev;
     });
 
@@ -2027,25 +2360,48 @@ function handleSearch(query) {
     if (filteredGames.length || filteredCompanies.length) {
         el.searchResults.classList.remove('hidden');
         currentState.selectedSearchIndex = -1;
-        el.searchResults.innerHTML = [
-            ...filteredGames.map(g => `
+
+        let html = '';
+
+        // Add Filter Indicator
+        if (filters.genre || filters.year || filters.developer) {
+            const t = UI_TEXT[currentState.lang];
+            html += `<div class="search-section-header" style="background: rgba(var(--primary-rgb), 0.1); padding: 0.5rem 1rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--primary);">
+                <span>🔍 ${t.showing}: </span>
+                ${filters.genre ? `<span class="filter-tag">${filters.genre}</span>` : ''}
+                ${filters.year ? `<span class="filter-tag">${filters.year}</span>` : ''}
+                ${filters.developer ? `<span class="filter-tag">${COMPANIES_DATA.find(c => c.id === filters.developer)?.name || filters.developer}</span>` : ''}
+            </div>`;
+        }
+        if (filteredGames.length) {
+            html += `<div class="search-section-header">${currentState.lang === 'es' ? 'Juegos' : 'Games'}</div>`;
+            html += filteredGames.slice(0, 10).map(g => `
                 <div class="search-item" onclick="window.dispatchEvent(new CustomEvent('nav', {detail: '${g.id}'}))">
-                    <img src="${getGameImage(g)}" style="width: 30px; height: 17px; object-fit: cover; border-radius: 2px; margin-right: 10px;">
+                    <img src="${getGameImage(g)}" alt="${g.title}">
                     <div style="display: flex; flex-direction: column;">
-                        <span style="font-weight: 600; font-size: 0.9rem;">${g.title}</span>
-                        <span style="font-size: 0.7rem; color: var(--text-muted);">${g.genre} • ${g.releaseDate.split('-')[0]}</span>
+                        <span class="item-title">${g.title}</span>
+                        <span class="item-meta">${g.genre.split(',')[0]} • ${g.releaseDate.split('-')[0]}</span>
                     </div>
                 </div>
-            `),
-            ...filteredCompanies.map(c => `
+            `).join('');
+        }
+
+        if (filteredCompanies.length) {
+            html += `<div class="search-section-header">${currentState.lang === 'es' ? 'Compañías' : 'Companies'}</div>`;
+            html += filteredCompanies.slice(0, 5).map(c => `
                 <div class="search-item" onclick="window.dispatchEvent(new CustomEvent('nav', {detail: '${c.id}'}))">
-                    <img src="https://api.dicebear.com/7.x/shapes/svg?seed=${c.id}" style="width: 20px; vertical-align: middle; margin-right: 10px;">
-                    <span>${c.name}</span>
+                    <img src="https://api.dicebear.com/7.x/shapes/svg?seed=${c.id}" style="width: 25px; height: 25px;">
+                    <span class="item-title">${c.name}</span>
                 </div>
-            `)
-        ].join('');
+            `).join('');
+        }
+
+        el.searchResults.innerHTML = html;
     } else {
-        el.searchResults.innerHTML = `<div style="padding: 1rem; text-align: center; color: var(--text-muted);">${currentState.lang === 'es' ? 'No se encontraron resultados' : 'No results found'}</div>`;
+        el.searchResults.innerHTML = `<div style="padding: 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 0.5rem; opacity: 0.5;"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><br>
+            ${currentState.lang === 'es' ? 'No se encontraron resultados' : 'No results found'}
+        </div>`;
         el.searchResults.classList.remove('hidden');
     }
 }
@@ -2063,22 +2419,37 @@ function updateSearchSelection(items) {
 
 // --- Modal Logic ---
 function setupModalListeners() {
-    const modal = document.getElementById('deals-modal');
-    const closeBtn = document.querySelector('.close-modal');
+    const modals = document.querySelectorAll('.modal');
 
-    if (closeBtn) {
-        closeBtn.onclick = () => {
-            modal.classList.remove('visible');
-            setTimeout(() => modal.classList.add('hidden'), 300);
-        };
-    }
-
-    window.onclick = (event) => {
-        if (event.target === modal) {
-            modal.classList.remove('visible');
-            setTimeout(() => modal.classList.add('hidden'), 300);
+    modals.forEach(modal => {
+        const closeBtn = modal.querySelector('.close-modal');
+        if (closeBtn) {
+            closeBtn.onclick = () => {
+                modal.classList.remove('visible');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    // If video modal, stop video
+                    if (modal.id === 'video-modal') {
+                        const container = document.getElementById('video-player-container');
+                        if (container) container.innerHTML = '';
+                    }
+                }, 300);
+            };
         }
-    };
+
+        modal.onclick = (event) => {
+            if (event.target === modal) {
+                modal.classList.remove('visible');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    if (modal.id === 'video-modal') {
+                        const container = document.getElementById('video-player-container');
+                        if (container) container.innerHTML = '';
+                    }
+                }, 300);
+            }
+        };
+    });
 }
 
 async function openDealsModal(gameId) {
@@ -2086,6 +2457,8 @@ async function openDealsModal(gameId) {
         transformRAWGToGame(currentState.discoveryGames.find(g => `rawg-${g.id}` === gameId)) ||
         transformRAWGToGame(currentState.dynamicDetails[gameId.replace('rawg-', '')]);
     if (!game) return;
+
+    if (typeof trackDealCheck === 'function') trackDealCheck(gameId);
 
     const modal = document.getElementById('deals-modal');
     const container = document.getElementById('modal-stores');
@@ -2195,6 +2568,22 @@ async function renderStoresToContainer(game, lang, container) {
 // --- Initialization ---
 
 function init() {
+    // DIAGNOSTIC CLEANUP: Fix Silent Hill 2 corruption from old data
+    const enriched = JSON.parse(localStorage.getItem('gamewiki-enriched') || '{}');
+    if (enriched['silent-hill-2'] && (enriched['silent-hill-2'].id !== 824851 || enriched['silent-hill-2'].released?.includes('2001'))) {
+        console.log('🚨 Correcting Silent Hill 2 data mismatch...');
+        delete enriched['silent-hill-2'];
+        localStorage.setItem('gamewiki-enriched', JSON.stringify(enriched));
+        // Also clear the persistent search cache to avoid fetching the same wrong game
+        localStorage.removeItem('gamewiki_rawg_cache');
+
+        // Clean up current state if it's already loaded
+        if (typeof currentState !== 'undefined') {
+            delete currentState.enrichedData['silent-hill-2'];
+            delete currentState.dynamicDetails['silent-hill-2'];
+        }
+    }
+
     // Load user preferences from localStorage
     const savedLang = localStorage.getItem('gamewiki-lang');
     if (savedLang) currentState.lang = savedLang;
@@ -2219,6 +2608,12 @@ function init() {
             console.error('Failed to load enriched data:', e);
         }
     }
+
+    // Load search history
+    loadSearchHistory();
+
+    // Load achievements
+    if (typeof loadAchievements === 'function') loadAchievements();
 
     // Initialize Search Filters
     initializeSearchFilters();
@@ -2287,8 +2682,10 @@ function init() {
                 navigateToWiki(state.id, true);
             }
         } else {
-            // Default to home if no state
-            renderHome(null, true);
+            // Only go home if no state AND no current hash (avoids bug with TOC/anchor links)
+            if (!window.location.hash && currentState.view !== 'home') {
+                renderHome(null, true);
+            }
         }
     };
 
@@ -2307,14 +2704,20 @@ function init() {
  */
 window.setupRAWG = function (apiKey) {
     if (!apiKey) {
-        console.log('📝 To setup RAWG API:');
-        console.log('1. Get your free API key from: https://rawg.io/login/?forward=developer');
-        console.log('2. Call: setupRAWG("your-api-key-here")');
-        console.log('3. Test with: testRAWG()');
+        const key = window.prompt(
+            currentState.lang === 'es'
+                ? 'Ingresa tu RAWG API Key:\n(Consíguela gratis en rawg.io/apidocs)'
+                : 'Enter your RAWG API Key:\n(Get it for free at rawg.io/apidocs)',
+            localStorage.getItem('rawg-api-key') || ''
+        );
+        if (key !== null) {
+            localStorage.setItem('rawg-api-key', key);
+            location.reload(); // Reload to apply changes
+        }
         return;
     }
 
-    setRAWGApiKey(apiKey);
+    localStorage.setItem('rawg-api-key', apiKey);
     console.log('✅ RAWG API configured successfully!');
     console.log('🧪 Test it with: testRAWG()');
 };
@@ -2372,6 +2775,18 @@ window.enrichSingleGame = async function (gameId) {
 
     console.log(`🔍 Enriching: ${game.title}...`);
     const enriched = await enrichGameData(game);
+
+    // TRY STEAM FALLBACK FOR REQUIREMENTS
+    const steamId = STEAM_APP_IDS[gameId];
+    if (steamId) {
+        console.log(`🔍 Checking Steam for additional data (AppID: ${steamId})...`);
+        const steamReqs = await fetchSteamRequirements(steamId);
+        if (steamReqs) {
+            console.log('✅ Steam requirements found!');
+            if (!enriched.rawg) enriched.rawg = {};
+            enriched.rawg.steamRequirements = steamReqs;
+        }
+    }
 
     if (enriched.rawg) {
         // PERMANENTLY UPDATE STATE
@@ -2462,5 +2877,107 @@ if (!localStorage.getItem('rawg-api-key')) {
     console.log('');
 }
 
+/**
+ * Native Share Integration
+ */
+window.shareGame = async (id, title) => {
+    const url = window.location.href;
+    const shareData = {
+        title: `GameWiki: ${title}`,
+        text: currentState.lang === 'es'
+            ? `¡Mira este juego en GameWiki: ${title}!`
+            : `Check out this game on GameWiki: ${title}!`,
+        url: url
+    };
+
+    try {
+        if (navigator.share) {
+            await navigator.share(shareData);
+            showToast(currentState.lang === 'es' ? '¡Compartido!' : 'Shared!', 'success');
+        } else {
+            await navigator.clipboard.writeText(url);
+            showToast(currentState.lang === 'es' ? 'Enlace copiado al portapapeles' : 'Link copied to clipboard', 'info');
+        }
+    } catch (err) {
+        // User cancelled share
+        if (err.name !== 'AbortError') console.error('Error sharing:', err);
+    }
+};
+
+/**
+ * Pull to Refresh Logic
+ */
+function initPullToRefresh() {
+    let touchStart = 0;
+    const indicator = document.getElementById('pull-refresh');
+    if (!indicator) return;
+    const threshold = 150;
+
+    window.addEventListener('touchstart', (e) => {
+        if (window.scrollY <= 10) {
+            touchStart = e.touches[0].clientY;
+        } else {
+            touchStart = 0;
+        }
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+        if (window.scrollY <= 10 && touchStart > 0) {
+            const pullDistance = e.touches[0].clientY - touchStart;
+            if (pullDistance > 20) {
+                indicator.classList.add('active');
+                indicator.style.height = `${Math.min(pullDistance * 0.4, 80)}px`;
+                const progress = Math.min(pullDistance / threshold, 1);
+                indicator.querySelector('svg').style.transform = `rotate(${progress * 360}deg)`;
+            }
+        }
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
+        const currentHeight = parseInt(indicator.style.height) || 0;
+        if (currentHeight >= 50) {
+            indicator.classList.add('refreshing');
+            indicator.style.height = '60px';
+
+            // Trigger Refresh (Simulation or Real)
+            setTimeout(() => {
+                if (currentState.view === 'home') {
+                    renderHome(currentState.currentGenre);
+                } else if (currentState.view === 'wiki') {
+                    renderWiki();
+                }
+
+                showToast(currentState.lang === 'es' ? 'Contenido actualizado' : 'Content updated', 'info');
+
+                setTimeout(() => {
+                    indicator.classList.remove('active', 'refreshing');
+                    indicator.style.height = '0';
+                    touchStart = 0;
+                }, 500);
+            }, 800);
+        } else {
+            indicator.classList.remove('active');
+            indicator.style.height = '0';
+            touchStart = 0;
+        }
+    });
+}
+
 init();
+
+// Initialize Mobile features
+initPullToRefresh();
+
+// Connectivity Monitor
+window.addEventListener('online', () => showToast(currentState.lang === 'es' ? 'Conexión restablecida' : 'Connection restored', 'success'));
+window.addEventListener('offline', () => showToast(currentState.lang === 'es' ? 'Modo sin conexión' : 'Offline mode', 'info'));
+
+// PWA: Service Worker Registration
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('🚀 GameWiki: PWA Service Worker Registered!'))
+            .catch(err => console.log('⚠️ GameWiki: PWA Registration Failed', err));
+    });
+}
 

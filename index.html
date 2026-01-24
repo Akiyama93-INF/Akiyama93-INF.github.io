@@ -1,10 +1,16 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GameWiki - Tu Enciclopedia de Videojuegos</title>
+    <title>GameWiki - La Enciclopedia del Gaming</title>
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="public/logo.png">
     <link rel="icon" type="image/png" href="public/logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,6 +36,13 @@
                             fill="currentColor" />
                     </svg>
                     <input type="text" id="game-search" placeholder="Busca un juego..." autocomplete="off">
+                    <button id="clear-search-btn" class="filters-toggle-btn" style="display: none;"
+                        title="Clear Search">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M18 6L6 18M6 6l12 12" />
+                        </svg>
+                    </button>
                     <button id="filters-toggle-btn" class="filters-toggle-btn" title="Advanced Filters">
                         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
                             stroke-width="2">
@@ -72,11 +85,26 @@
                 <button id="lang-toggle" class="lang-btn">
                     <span id="lang-text">EN</span>
                 </button>
+                <button id="achievements-btn" class="kbd-btn" title="Achievements">
+                    <span style="font-size: 1.2rem;">🏆</span>
+                </button>
+                <button id="kbd-shortcuts-btn" class="kbd-btn" title="Keyboard Shortcuts">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
+                    </svg>
+                </button>
             </div>
         </div>
     </header>
 
     <main id="app-content">
+        <!-- Pull to Refresh Indicator -->
+        <div id="pull-refresh" class="pull-refresh-indicator">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
+                class="refresh-icon">
+                <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+            </svg>
+        </div>
         <!-- Home Presentation Section -->
         <section id="hero" class="hero-section">
             <div class="hero-content">
@@ -119,8 +147,21 @@
 
     <footer class="main-footer">
         <p>&copy; 2025 GameWiki. Hecho por Akiyama para fans.</p>
-        <p>Game data provided by <a href="https://rawg.io/">RAWG</a></p>
+        <div style="display: flex; gap: 1rem; align-items: center; justify-content: center; margin-top: 0.5rem;">
+            <p style="margin: 0;">Game data provided by <a href="https://rawg.io/" target="_blank">RAWG</a></p>
+            <button onclick="setupRAWG()" class="lang-btn"
+                style="padding: 0.2rem 0.6rem; font-size: 0.75rem; opacity: 0.8;" title="Configurar API Key">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" />
+                    <path
+                        d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
+                </svg>
+                API
+            </button>
+        </div>
     </footer>
+
+    <div id="toast-container" class="toast-container"></div>
 
     <!-- Deals Modal -->
     <div id="deals-modal" class="modal hidden">
@@ -133,16 +174,72 @@
         </div>
     </div>
 
+    <!-- Video Modal for Trailers -->
+    <div id="video-modal" class="modal hidden">
+        <div class="modal-content video-modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="video-player-container">
+                <!-- Video iframe will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Keyboard Shortcuts Modal -->
+    <div id="kbd-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="kbd-modal-title">Atajos de Teclado</h2>
+            <div class="kbd-modal-grid">
+                <div class="kbd-item">
+                    <kbd>/</kbd>
+                    <span class="kbd-desc" data-key="kbd-search">Buscar juegos</span>
+                </div>
+                <div class="kbd-item">
+                    <kbd>Alt</kbd> + <kbd>H</kbd>
+                    <span class="kbd-desc" data-key="kbd-home">Ir al Inicio</span>
+                </div>
+                <div class="kbd-item">
+                    <kbd>Alt</kbd> + <kbd>F</kbd>
+                    <span class="kbd-desc" data-key="kbd-favs">Mis Favoritos</span>
+                </div>
+                <div class="kbd-item">
+                    <kbd>Esc</kbd>
+                    <span class="kbd-desc" data-key="kbd-esc">Cerrar ventanas / búsqueda</span>
+                </div>
+                <div class="kbd-item">
+                    <kbd>↑</kbd> <kbd>↓</kbd>
+                    <span class="kbd-desc" data-key="kbd-nav">Navegar resultados</span>
+                </div>
+                <div class="kbd-item">
+                    <kbd>Enter</kbd>
+                    <span class="kbd-desc" data-key="kbd-enter">Seleccionar resultado</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Achievements Modal -->
+    <div id="achievements-modal" class="modal hidden">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <h2 id="ach-modal-title">Logros de la Wiki</h2>
+            <div id="achievements-grid" class="ach-grid">
+                <!-- Data populated via JS -->
+            </div>
+        </div>
+    </div>
+
     <!-- Lightbox for Image Gallery -->
     <div id="lightbox" class="lightbox">
         <button class="lightbox-close">&times;</button>
         <img class="lightbox-img" src="" alt="Full size screenshot">
     </div>
 
-    <script src="src/data.js"></script>
-    <script src="src/rawg-api.js"></script>
-    <script src="src/search-functions.js"></script>
-    <script src="src/main.js"></script>
+    <script src="src/data.js?v=2.1"></script>
+    <script src="src/rawg-api.js?v=2.1"></script>
+    <script src="src/search-functions.js?v=2.1"></script>
+    <script src="src/achievements.js?v=2.1"></script>
+    <script src="src/main.js?v=2.1"></script>
 </body>
 
 </html>

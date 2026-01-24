@@ -11,7 +11,7 @@
 // ============================================================================
 
 const RAWG_CONFIG = {
-    baseUrl: '/.netlify/functions/rawg', // Points to our Netlify serverless function
+    baseUrl: 'https://api.rawg.io/api', // Direct API access
     cache: new Map(),
     persistentCache: {}, // Loaded from localStorage
     cacheExpiry: 1000 * 60 * 60 * 24, // 24 hours
@@ -84,6 +84,19 @@ function setCachedData(key, data, persistent = false) {
     }
 }
 
+/**
+ * Clear all cached RAWG data
+ */
+function clearRAWGCache() {
+    RAWG_CONFIG.cache.clear();
+    RAWG_CONFIG.persistentCache = {};
+    localStorage.removeItem(RAWG_CONFIG.persistentKey);
+    console.log('🧹 RAWG Cache cleared successfully!');
+}
+
+// Expose to window for console usage
+window.clearRAWGCache = clearRAWGCache;
+
 // ============================================================================
 // API REQUEST HELPERS
 // ============================================================================
@@ -96,17 +109,32 @@ function setCachedData(key, data, persistent = false) {
  * @returns {Promise<object>} API response data
  */
 async function rawgRequest(endpoint, params = {}, persistent = false) {
-    // Build URL for our local proxy
-    const url = new URL(window.location.origin + RAWG_CONFIG.baseUrl);
-    url.searchParams.append('endpoint', endpoint);
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const apiKey = localStorage.getItem('rawg-api-key');
 
-    // Sort keys to ensure consistent cache keys
-    const sortedKeys = Object.keys(params).sort();
-    sortedKeys.forEach(key => {
-        if (params[key] !== null && params[key] !== undefined) {
-            url.searchParams.append(key, params[key]);
-        }
-    });
+    let url;
+
+    // Use Netlify Proxy in production, or if no local API key is found
+    // This allows the app to work on Netlify using the environment variable
+    if (!isLocal || !apiKey) {
+        url = new URL('/.netlify/functions/rawg', window.location.origin);
+        url.searchParams.append('endpoint', endpoint);
+        // Add other params
+        Object.keys(params).forEach(key => {
+            if (params[key] !== null && params[key] !== undefined) {
+                url.searchParams.append(key, params[key]);
+            }
+        });
+    } else {
+        // Direct API call for local development with an API key
+        url = new URL(RAWG_CONFIG.baseUrl + endpoint);
+        url.searchParams.append('key', apiKey);
+        Object.keys(params).forEach(key => {
+            if (params[key] !== null && params[key] !== undefined) {
+                url.searchParams.append(key, params[key]);
+            }
+        });
+    }
 
     // Check cache
     const cacheKey = url.toString();
@@ -117,11 +145,12 @@ async function rawgRequest(endpoint, params = {}, persistent = false) {
     }
 
     try {
-        console.log('🌐 Fetching via Proxy:', endpoint);
+        console.log(isLocal && apiKey ? '🌐 Fetching directly from RAWG:' : '🌐 Fetching via Netlify Proxy:', endpoint);
         const response = await fetch(url);
 
         if (!response.ok) {
-            throw new Error(`Proxy error: ${response.status} ${response.statusText}`);
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `Request error: ${response.status} ${response.statusText}`);
         }
 
         const data = await response.json();
@@ -130,6 +159,35 @@ async function rawgRequest(endpoint, params = {}, persistent = false) {
 
     } catch (error) {
         console.error('❌ Request failed:', error);
+
+        // If proxy fails and we have a local key, try direct as fallback
+        if (!isLocal && apiKey && !endpoint.startsWith('https')) {
+            console.log('🔄 Attempting direct fallback...');
+            const fallbackUrl = new URL(RAWG_CONFIG.baseUrl + endpoint);
+            fallbackUrl.searchParams.append('key', apiKey);
+            Object.keys(params).forEach(key => {
+                if (params[key] !== null && params[key] !== undefined) {
+                    fallbackUrl.searchParams.append(key, params[key]);
+                }
+            });
+            return await rawgRequestDirect(fallbackUrl, cacheKey, persistent);
+        }
+
+        return null;
+    }
+}
+
+/**
+ * Direct fallback for RAWG requests
+ */
+async function rawgRequestDirect(url, cacheKey, persistent) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) return null;
+        const data = await response.json();
+        setCachedData(cacheKey, data, persistent);
+        return data;
+    } catch (e) {
         return null;
     }
 }
@@ -186,26 +244,40 @@ async function getGameDetails(gameId) {
  * @param {string} gameName - Name of the game
  * @returns {Promise<object|null>} Best matching game or null
  */
-async function findGameByName(gameName) {
-    const results = await searchGames(gameName, 5);
+async function findGameByName(gameName, releaseDate = null) {
+    const results = await searchGames(gameName, 10); // More results for better matching
 
     if (!results || results.length === 0) {
         console.log(`❌ No results found for: ${gameName}`);
         return null;
     }
 
-    // Try to find exact match first
+    const targetYear = releaseDate ? releaseDate.split('-')[0] : null;
+
+    // 1. Try to find exact name match with exact year
+    if (targetYear) {
+        const exactMatchYear = results.find(game =>
+            game.name.toLowerCase() === gameName.toLowerCase() &&
+            game.released && game.released.startsWith(targetYear)
+        );
+        if (exactMatchYear) {
+            console.log(`✅ Exact match with year found: ${exactMatchYear.name} (${targetYear})`);
+            return exactMatchYear;
+        }
+    }
+
+    // 2. Try to find exact name match
     const exactMatch = results.find(game =>
         game.name.toLowerCase() === gameName.toLowerCase()
     );
 
     if (exactMatch) {
-        console.log(`✅ Exact match found: ${exactMatch.name}`);
+        console.log(`✅ Exact name match found: ${exactMatch.name}`);
         return exactMatch;
     }
 
-    // Return best match (first result)
-    console.log(`✅ Best match found: ${results[0].name} (searched: ${gameName})`);
+    // 3. Return best fuzzy match (results are already sorted by relevance)
+    console.log(`✅ Best relevance match found: ${results[0].name} (searched: ${gameName})`);
     return results[0];
 }
 
@@ -261,6 +333,16 @@ async function getGameDLC(gameId) {
     return data?.results || [];
 }
 
+/**
+ * Get achievements for a game
+ * @param {number} gameId - RAWG game ID
+ * @returns {Promise<Array>} Array of achievements
+ */
+async function getGameAchievements(gameId) {
+    const data = await rawgRequest(`/games/${gameId}/achievements`, { page_size: 20 }, true);
+    return data?.results || [];
+}
+
 // ============================================================================
 // ENRICH EXISTING GAME DATA
 // ============================================================================
@@ -277,7 +359,7 @@ async function enrichGameData(game) {
 
         // If we don't have a specific ID, we search by name
         if (!rawgId) {
-            const rawgGame = await findGameByName(game.title);
+            const rawgGame = await findGameByName(game.title, game.releaseDate);
             if (!rawgGame) {
                 console.log(`⚠️ Could not enrich: ${game.title}`);
                 return game;
